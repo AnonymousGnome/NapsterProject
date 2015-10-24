@@ -53,8 +53,10 @@ namespace NapsterProject
             //continually loops for thread's lifetime
             while (true)
             {
+                Console.WriteLine("Opening TCP listener...");
                 socketTCP.Listen(10); //puts into listening state
                 Socket newSock = socketTCP.Accept(); //accepts incoming connection
+                Console.WriteLine("Incoming Connection on port 9000...");
                 Thread newCli = new Thread(new ParameterizedThreadStart(newCliFunc)); //generates new thread and socket for handling new client
                 newCli.Start(newSock); //starts thread and passes socket to thread function
             }

@@ -23,21 +23,37 @@ namespace ClientFormProject
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void registerButton_Click(object sender, EventArgs e)
         {
             buffer = new byte[2048];
 
             sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            IPHostEntry ipHost = Dns.GetHostEntry("");
-            IPAddress ipAddr = ipHost.AddressList[0];
-            
-            sock.Connect(ipAddr, 9000);
-            if(!sock.Connected)
-            {
-                disconnectButton.Enabled = true;
-            }
 
-            sock.Send(buffer);
+            try
+            {
+                string ipString = hostIPText.Text;
+                hostIPText.Text = "";
+                sock.Connect(IPAddress.Parse(ipString), 9000);
+
+                disconnectButton.Enabled = true;
+                refreshButton.Enabled = true;
+
+                //sock.Send(buffer);
+            }
+            catch (SocketException socex)
+            {
+                errorLabel.Text = socex.Message;
+                //errorLabel.Text = "Error connecting to server...";
+            }
+            catch (Exception except)
+            {
+                errorLabel.Text = except.Message;
+            }
+        }
+
+        private void refreshButton_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
