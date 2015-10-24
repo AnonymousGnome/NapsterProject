@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NapsterProject", "NapsterProject\NapsterProject.csproj", "{1C478EB0-7CC1-454D-BED5-E0C84AE17B88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientFormProject", "ClientForm\ClientFormProject.csproj", "{39B753C4-46AF-458D-B989-4661834B0F19}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1C478EB0-7CC1-454D-BED5-E0C84AE17B88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C478EB0-7CC1-454D-BED5-E0C84AE17B88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C478EB0-7CC1-454D-BED5-E0C84AE17B88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C478EB0-7CC1-454D-BED5-E0C84AE17B88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39B753C4-46AF-458D-B989-4661834B0F19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39B753C4-46AF-458D-B989-4661834B0F19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39B753C4-46AF-458D-B989-4661834B0F19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39B753C4-46AF-458D-B989-4661834B0F19}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
