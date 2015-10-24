@@ -25,14 +25,14 @@ namespace NapsterProject
             
 
             //Resolves local IP and associates ports
-            IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddr = ipHost.AddressList[0];
+            //IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
+            //IPAddress ipAddr = ipHost.AddressList[0];
+            //IPAddress ipAddress = Dns.GetHostEntry("localhost").AddressList[0];
 
-            socketTCP = new Socket(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socketUDP = new Socket(ipAddr.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
-
-            ipEndPointTCP = new IPEndPoint(ipAddr, portNoTCP);
-            ipEndPointUDP = new IPEndPoint(ipAddr, portNoUDP);
+            socketTCP = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socketUDP = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            ipEndPointTCP = new IPEndPoint(IPAddress.Parse("0.0.0.0"), portNoTCP);
+            ipEndPointUDP = new IPEndPoint(IPAddress.Parse("0.0.0.0"), portNoUDP);
 
             //Binds sockets to ports
             socketTCP.Bind(ipEndPointTCP);

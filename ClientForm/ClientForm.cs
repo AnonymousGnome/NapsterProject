@@ -43,6 +43,7 @@ namespace ClientFormProject
             catch (SocketException socex)
             {
                 errorLabel.Text = socex.Message;
+                Console.WriteLine(socex.StackTrace);
                 //errorLabel.Text = "Error connecting to server...";
             }
             catch (Exception except)
