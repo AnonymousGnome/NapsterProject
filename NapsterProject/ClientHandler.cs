@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.IO;
 
 namespace NapsterProject
 {
@@ -80,7 +81,9 @@ namespace NapsterProject
             Socket tempSock = newSock as Socket; //retrieves socket from passed parameter
             byte[] buffer = new byte[2048]; //buffer for receiving info from client
             peerHandler.ReceivePeer(tempSock.RemoteEndPoint);
-            tempSock.Receive(buffer); //receives info from client
+            int size = tempSock.Receive(buffer); //receives info from client
+            char[] delimiters = {';'};
+            addToFileList(new List<string>(Encoding.ASCII.GetString(buffer, 0, size).Split(delimiters)));
 
             /*
              * This will place client's available file info into 
@@ -89,6 +92,13 @@ namespace NapsterProject
              * peers (peer ips and files available to download)
              */
             Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
+        }
+
+        private void addToFileList(List<string> files)
+        {
+            string directoryFile = ""; // The file where we want to save the client/file informaiton
+            File.WriteAllLines(directoryFile, files); // Write all the data in the list to the file.
+            // Save the list of files from the client to the directory.
         }
     }
 }
