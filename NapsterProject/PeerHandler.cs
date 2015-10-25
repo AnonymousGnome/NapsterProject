@@ -12,23 +12,23 @@ namespace NapsterProject
     class PeerHandler
     {
         private string path;
-        private System.Windows.Forms.Timer timer; // timer for UDP hello message
+        private Timer timer; // timer for UDP hello message
         private int countDown = 1; // seconds timer waits until send next message
         private Dictionary<IPAddress, int> peerTimers;
+        private int timeToWait;
 
         public PeerHandler(string path)
         {
             this.path = path;
-            timer = new System.Windows.Forms.Timer();
-            timer.Tick += new EventHandler(CleanList);
+            TimerCallback callback = new TimerCallback(CleanList);
+            timer = new Timer(callback, null, 0, 1000);
             peerTimers = new Dictionary<IPAddress, int>();
-            timer.Interval = 1000;
-            timer.Start();
+            timeToWait = 30;
         }
 
         public void ReceivePeer(IPEndPoint ipEnd)
         {
-            peerTimers.Add(ipEnd.Address, 200);
+            peerTimers.Add(ipEnd.Address, timeToWait);
         }
 
         public void UpdateClient(EndPoint sender)
@@ -39,12 +39,12 @@ namespace NapsterProject
             {
                 if(p.Key == IPAddress.Parse(ipEnd.ToString().Split(':')[0]))
                 {
-                    peerTimers[p.Key] = 200;
+                    peerTimers[p.Key] = timeToWait;
                 }
             }
         }
 
-        private void CleanList(object sender, EventArgs e)
+        void CleanList(object o)
         {
             countDown--;
             if (countDown < 1)
@@ -55,6 +55,7 @@ namespace NapsterProject
                 {
                     int value = p.Value;
                     value--;
+                    Console.WriteLine(p.Value);
                     if(value < 1)
                     {
                         Console.WriteLine("Removed {0} from list.", p.Key);
