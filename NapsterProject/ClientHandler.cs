@@ -71,6 +71,7 @@ namespace NapsterProject
                 IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
                 EndPoint Remote = (EndPoint)(sender);
                 int recv = socketUDP.ReceiveFrom(data, ref Remote);
+                peerHandler.UpdateClient(Remote);
                 Console.WriteLine("Message received from {0}:", Remote.ToString());
                 Console.WriteLine(Encoding.ASCII.GetString(data, 0, recv));
             }
