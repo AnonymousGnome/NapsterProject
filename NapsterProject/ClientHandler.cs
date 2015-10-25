@@ -11,28 +11,18 @@ namespace NapsterProject
 {
     class ClientHandler
     {
-        private int portNoTCP, portNoUDP;
         private Socket socketTCP, socketUDP;
         private IPEndPoint ipEndPointTCP, ipEndPointUDP;
 
         public ClientHandler()
         {
             //Stores port numbers
-            this.portNoTCP = 9000;
-            portNoUDP = 9001;
 
             //Creates sockets for TCP and UDP listeners
-            
-
-            //Resolves local IP and associates ports
-            //IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
-            //IPAddress ipAddr = ipHost.AddressList[0];
-            //IPAddress ipAddress = Dns.GetHostEntry("localhost").AddressList[0];
-
             socketTCP = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socketUDP = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            ipEndPointTCP = new IPEndPoint(IPAddress.Parse("0.0.0.0"), portNoTCP);
-            ipEndPointUDP = new IPEndPoint(IPAddress.Parse("0.0.0.0"), portNoUDP);
+            ipEndPointTCP = new IPEndPoint(IPAddress.Any, 9000);
+            ipEndPointUDP = new IPEndPoint(IPAddress.Any, 9001);
 
             //Binds sockets to ports
             socketTCP.Bind(ipEndPointTCP);
@@ -53,7 +43,6 @@ namespace NapsterProject
             //continually loops for thread's lifetime
             while (true)
             {
-                Console.WriteLine("Opening TCP listener...");
                 socketTCP.Listen(10); //puts into listening state
                 Socket newSock = socketTCP.Accept(); //accepts incoming connection
                 Console.WriteLine("Incoming Connection on port 9000...");
@@ -64,7 +53,17 @@ namespace NapsterProject
 
         private void udpFunc()
         {
-
+            byte[] data = new byte[2048];
+            //continually loops for thread's lifetime
+            while (true)
+            {
+                Console.Write("Waiting for client");
+                IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
+                EndPoint Remote = (EndPoint)(sender);
+                int recv = socketUDP.ReceiveFrom(data, ref Remote);
+                Console.WriteLine("Message received from {0}:", Remote.ToString());
+                Console.WriteLine(Encoding.ASCII.GetString(data, 0, recv));
+            }
         }
 
         private void newCliFunc(object newSock)

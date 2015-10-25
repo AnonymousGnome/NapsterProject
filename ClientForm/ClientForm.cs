@@ -16,9 +16,8 @@ namespace ClientFormProject
     public partial class ClientForm : Form
     {
         private Socket sock, sockUDP;
-        private bool registered;
         private System.Windows.Forms.Timer timer;
-        private int countDown = 60;
+        private int countDown = 10;
         private IPAddress hostIP;
         private IPEndPoint ipEnd;
         byte[] buffer, helloMes;
@@ -26,7 +25,6 @@ namespace ClientFormProject
         public ClientForm()
         {
             InitializeComponent();
-            registered = false;
             timer = new System.Windows.Forms.Timer();
             timer.Tick += new EventHandler(timerFunc);
             timer.Interval = 1000;
@@ -54,7 +52,6 @@ namespace ClientFormProject
                 registerButton.Enabled = false;
 
                 //sock.Send(buffer);
-                registered = true;
 
                 //starts hello message timer
                 timer.Start();
@@ -80,7 +77,7 @@ namespace ClientFormProject
             countDown--;
             if (countDown < 1)
             {
-                countDown = 60;
+                countDown = 10;
 
                 sockUDP.SendTo(helloMes, ipEnd);
             }
