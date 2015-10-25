@@ -79,6 +79,7 @@ namespace NapsterProject
         {
             Socket tempSock = newSock as Socket; //retrieves socket from passed parameter
             byte[] buffer = new byte[2048]; //buffer for receiving info from client
+            peerHandler.ReceivePeer(tempSock.RemoteEndPoint);
             tempSock.Receive(buffer); //receives info from client
 
             /*
