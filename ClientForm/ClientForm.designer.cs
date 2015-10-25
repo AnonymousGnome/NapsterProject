@@ -34,7 +34,9 @@
             this.fileBox = new System.Windows.Forms.ListBox();
             this.disconnectButton = new System.Windows.Forms.Button();
             this.refreshButton = new System.Windows.Forms.Button();
-            this.errorLabel = new System.Windows.Forms.Label();
+            this.messageLabel = new System.Windows.Forms.Label();
+            this.downloadButton = new System.Windows.Forms.Button();
+            this.openDirecButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // registerButton
@@ -93,20 +95,41 @@
             this.refreshButton.UseVisualStyleBackColor = true;
             this.refreshButton.Click += new System.EventHandler(this.refreshButton_Click);
             // 
-            // errorLabel
+            // messageLabel
             // 
-            this.errorLabel.AutoSize = true;
-            this.errorLabel.Location = new System.Drawing.Point(13, 421);
-            this.errorLabel.Name = "errorLabel";
-            this.errorLabel.Size = new System.Drawing.Size(0, 13);
-            this.errorLabel.TabIndex = 6;
+            this.messageLabel.AutoSize = true;
+            this.messageLabel.Location = new System.Drawing.Point(13, 421);
+            this.messageLabel.Name = "messageLabel";
+            this.messageLabel.Size = new System.Drawing.Size(85, 13);
+            this.messageLabel.TabIndex = 6;
+            this.messageLabel.Text = "[Message Label]";
+            // 
+            // downloadButton
+            // 
+            this.downloadButton.Location = new System.Drawing.Point(674, 421);
+            this.downloadButton.Name = "downloadButton";
+            this.downloadButton.Size = new System.Drawing.Size(118, 29);
+            this.downloadButton.TabIndex = 7;
+            this.downloadButton.Text = "Download";
+            this.downloadButton.UseVisualStyleBackColor = true;
+            // 
+            // openDirecButton
+            // 
+            this.openDirecButton.Location = new System.Drawing.Point(517, 100);
+            this.openDirecButton.Name = "openDirecButton";
+            this.openDirecButton.Size = new System.Drawing.Size(123, 29);
+            this.openDirecButton.TabIndex = 8;
+            this.openDirecButton.Text = "Open Directory";
+            this.openDirecButton.UseVisualStyleBackColor = true;
             // 
             // ClientForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(824, 446);
-            this.Controls.Add(this.errorLabel);
+            this.ClientSize = new System.Drawing.Size(826, 462);
+            this.Controls.Add(this.openDirecButton);
+            this.Controls.Add(this.downloadButton);
+            this.Controls.Add(this.messageLabel);
             this.Controls.Add(this.refreshButton);
             this.Controls.Add(this.disconnectButton);
             this.Controls.Add(this.fileBox);
@@ -128,6 +151,8 @@
         private System.Windows.Forms.ListBox fileBox;
         private System.Windows.Forms.Button disconnectButton;
         private System.Windows.Forms.Button refreshButton;
-        private System.Windows.Forms.Label errorLabel;
+        private System.Windows.Forms.Label messageLabel;
+        private System.Windows.Forms.Button downloadButton;
+        private System.Windows.Forms.Button openDirecButton;
     }
 }

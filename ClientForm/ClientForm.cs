@@ -29,6 +29,7 @@ namespace ClientFormProject
             timer.Tick += new EventHandler(timerFunc);
             timer.Interval = 1000;
             helloMes = ASCIIEncoding.ASCII.GetBytes("Hello");
+            messageLabel.Text = "";
         }
 
         private void registerButton_Click(object sender, EventArgs e)
@@ -58,12 +59,12 @@ namespace ClientFormProject
             }
             catch (SocketException socex)
             {
-                errorLabel.Text = socex.Message;
+                messageLabel.Text = socex.Message;
                 //errorLabel.Text = "Error connecting to server...";
             }
             catch (Exception except)
             {
-                errorLabel.Text = except.Message;
+                messageLabel.Text = except.Message;
             }
         }
 
@@ -90,7 +91,7 @@ namespace ClientFormProject
             registerButton.Enabled = true;
             refreshButton.Enabled = false;
             disconnectButton.Enabled = false;
-            errorLabel.Text = "Disconnected from server...";
+            messageLabel.Text = "Disconnected from server...";
             fileBox.Items.Clear();
         }
     }
