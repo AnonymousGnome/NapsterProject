@@ -16,14 +16,14 @@ namespace ClientFormProject
 {
     public partial class ClientForm : Form
     {
-        private Socket sock, sockUDP;
-        private System.Windows.Forms.Timer timer;
-        private int countDown = 10;
-        private IPAddress hostIP;
-        private IPEndPoint ipEnd;
+        private Socket sock, sockUDP; // sockets for connecting to directory server
+        private System.Windows.Forms.Timer timer; // timer for UDP hello message
+        private int countDown = 10; // seconds timer waits until send next message
+        private IPAddress hostIP; // holds ip for the central directory server
+        private IPEndPoint ipEnd; // endpoint for hello message to directory server
 
-        byte[] buffer, helloMes;
-        string path;
+        byte[] buffer, helloMes; // bufferes for sending over network
+        string path; // Filepath for shared files
 
         public ClientForm()
         {
@@ -78,6 +78,9 @@ namespace ClientFormProject
 
         }
 
+        /*
+         * Sends hello message via UDP socket to directory server and restarts timer
+         */
         void timerFunc(object sender, EventArgs e)
         {
             countDown--;
@@ -89,6 +92,9 @@ namespace ClientFormProject
             }
         }
 
+        /*
+         * Stops hello message timer, clears file download list, and switches active and inactive buttons
+         */
         private void disconnectButton_Click(object sender, EventArgs e)
         {
             timer.Stop();
@@ -100,6 +106,9 @@ namespace ClientFormProject
             fileBox.Items.Clear();
         }
 
+        /*
+         * Opens up file directory for shared and downloaded files
+         */
         private void openDirecButton_Click(object sender, EventArgs e)
         {
             if (System.IO.Directory.Exists(path))
