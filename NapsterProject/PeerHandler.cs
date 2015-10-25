@@ -12,26 +12,34 @@ namespace NapsterProject
 {
     class PeerHandler
     {
-        private string path;
+        private string path; // filepath for the peer directory
         private Timer timer; // timer for UDP hello message
         private int countDown = 1; // seconds timer waits until send next message
-        private ConcurrentDictionary<IPAddress, int> peerTimers;
-        private int timeToWait;
+        private ConcurrentDictionary<IPAddress, int> peerTimers; // thread safe dictionary that holds peer ips and time since last udp hello
+        private int timeToWait; // time to allow between udp hello messages before being removed from the registry
 
         public PeerHandler(string path)
         {
             this.path = path;
+
+            //creates timer
             TimerCallback callback = new TimerCallback(CleanList);
             timer = new Timer(callback, null, 0, 1000);
             peerTimers = new ConcurrentDictionary<IPAddress, int>();
             timeToWait = 30;
         }
 
+        /*
+         * Takes in new peer and adds them to the timer dictionary
+         */
         public void ReceivePeer(EndPoint ipEnd)
         {
             peerTimers.TryAdd(IPAddress.Parse(ipEnd.ToString().Split(':')[0]), timeToWait);
         }
 
+        /*
+         * Restarts the peer's timer in the timer dicitonary
+         */
         public void UpdateClient(EndPoint sender)
         {
             EndPoint ipEnd = sender;
@@ -42,6 +50,10 @@ namespace NapsterProject
             }
         }
 
+        /*
+         * Timer function, each second it will go through the dictionary,
+         * decrementing each timer value down by a second and removing expired peers
+         */
         void CleanList(object o)
         {
             Console.WriteLine("Cleaning list...");
