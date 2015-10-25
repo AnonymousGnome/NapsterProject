@@ -15,35 +15,53 @@ namespace ClientFormProject
 {
     public partial class ClientForm : Form
     {
-        private Socket sock;
-        byte[] buffer;
+        private Socket sock, sockUDP;
+        private bool registered;
+        private System.Windows.Forms.Timer timer;
+        private int countDown = 60;
+        private IPAddress hostIP;
+        private IPEndPoint ipEnd;
+        byte[] buffer, helloMes;
 
         public ClientForm()
         {
             InitializeComponent();
+            registered = false;
+            timer = new System.Windows.Forms.Timer();
+            timer.Tick += new EventHandler(timerFunc);
+            timer.Interval = 1000;
+            helloMes = ASCIIEncoding.ASCII.GetBytes("Hello");
         }
 
         private void registerButton_Click(object sender, EventArgs e)
         {
             buffer = new byte[2048];
 
+            //creates sockets for TCP and UDP connections
             sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            sockUDP = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
             try
             {
-                string ipString = hostIPText.Text;
-                hostIPText.Text = "";
-                sock.Connect(IPAddress.Parse(ipString), 9000);
+                //Takes input host ip address and establishes connection
+                hostIP = IPAddress.Parse(hostIPText.Text);
+                sock.Connect(hostIP, 9000);
+                ipEnd = new IPEndPoint(hostIP, 9001);
 
+                //activates buttons
                 disconnectButton.Enabled = true;
                 refreshButton.Enabled = true;
+                registerButton.Enabled = false;
 
                 //sock.Send(buffer);
+                registered = true;
+
+                //starts hello message timer
+                timer.Start();
             }
             catch (SocketException socex)
             {
                 errorLabel.Text = socex.Message;
-                Console.WriteLine(socex.StackTrace);
                 //errorLabel.Text = "Error connecting to server...";
             }
             catch (Exception except)
@@ -55,6 +73,17 @@ namespace ClientFormProject
         private void refreshButton_Click(object sender, EventArgs e)
         {
 
+        }
+
+        void timerFunc(object sender, EventArgs e)
+        {
+            countDown--;
+            if (countDown < 1)
+            {
+                countDown = 60;
+
+                sockUDP.SendTo(helloMes, ipEnd);
+            }
         }
     }
 }

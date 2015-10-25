@@ -31,7 +31,7 @@
             this.registerButton = new System.Windows.Forms.Button();
             this.hostIPText = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.fileBox = new System.Windows.Forms.ListBox();
             this.disconnectButton = new System.Windows.Forms.Button();
             this.refreshButton = new System.Windows.Forms.Button();
             this.errorLabel = new System.Windows.Forms.Label();
@@ -63,13 +63,13 @@
             this.label1.TabIndex = 2;
             this.label1.Text = "Host IP";
             // 
-            // listBox1
+            // fileBox
             // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(12, 145);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(800, 264);
-            this.listBox1.TabIndex = 3;
+            this.fileBox.FormattingEnabled = true;
+            this.fileBox.Location = new System.Drawing.Point(12, 145);
+            this.fileBox.Name = "fileBox";
+            this.fileBox.Size = new System.Drawing.Size(800, 264);
+            this.fileBox.TabIndex = 3;
             // 
             // disconnectButton
             // 
@@ -108,7 +108,7 @@
             this.Controls.Add(this.errorLabel);
             this.Controls.Add(this.refreshButton);
             this.Controls.Add(this.disconnectButton);
-            this.Controls.Add(this.listBox1);
+            this.Controls.Add(this.fileBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.hostIPText);
             this.Controls.Add(this.registerButton);
@@ -124,7 +124,7 @@
         private System.Windows.Forms.Button registerButton;
         private System.Windows.Forms.TextBox hostIPText;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.ListBox fileBox;
         private System.Windows.Forms.Button disconnectButton;
         private System.Windows.Forms.Button refreshButton;
         private System.Windows.Forms.Label errorLabel;
