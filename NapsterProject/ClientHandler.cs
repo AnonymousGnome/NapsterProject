@@ -88,7 +88,8 @@ namespace NapsterProject
              * and send the client the available info on registered
              * peers (peer ips and files available to download)
              */
-            Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
+            string message = ASCIIEncoding.ASCII.GetString(buffer);
+            Console.WriteLine(message.Substring(0, message.LastIndexOf(';')));
         }
     }
 }

@@ -57,15 +57,22 @@ namespace ClientFormProject
                 refreshButton.Enabled = true;
                 registerButton.Enabled = false;
 
-                //sock.Send(buffer);
+                
                 /*
                  * This will send all file names in the SharedFiles folder to
                  * The directory server as well as retrieves available peer
                  * info from the directory server.
                  */
-                string[] fileEntries = Directory.GetFiles(path);
+                string[] fileEntries = Directory.GetFiles(path); // retrieves filenames of all files in the SharedFiles folder
+                string sendString = "";
                 foreach (string s in fileEntries)
-                    Console.WriteLine(s);
+                {
+                    string[] temp = s.Split('\\');
+                    sendString +=  temp[temp.Length - 1] + ";";
+                }
+
+                buffer = ASCIIEncoding.ASCII.GetBytes(sendString);
+                sock.Send(buffer);
 
                 //starts hello message timer
                 timer.Start();
