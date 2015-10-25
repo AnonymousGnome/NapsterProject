@@ -13,6 +13,8 @@ namespace NapsterProject
     {
         private Socket socketTCP, socketUDP;
         private IPEndPoint ipEndPointTCP, ipEndPointUDP;
+        private string path;
+        private PeerHandler peerHandler;
 
         public ClientHandler()
         {
@@ -27,6 +29,13 @@ namespace NapsterProject
             //Binds sockets to ports
             socketTCP.Bind(ipEndPointTCP);
             socketUDP.Bind(ipEndPointUDP);
+
+            //Creates directory for storing registered peers
+            path = @".\PeerDirectory";
+            System.IO.Directory.CreateDirectory(path);
+
+            //Creates handler for managing registered peers
+            peerHandler = new PeerHandler(path);
         }
 
         public void StartListening()
