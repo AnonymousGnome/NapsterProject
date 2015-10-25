@@ -14,6 +14,7 @@ namespace NapsterProject
         private string path;
         private System.Windows.Forms.Timer timer; // timer for UDP hello message
         private int countDown = 1; // seconds timer waits until send next message
+        private Dictionary<IPAddress, int> peerTimers;
 
         public PeerHandler(string path)
         {
@@ -25,14 +26,20 @@ namespace NapsterProject
 
         public void ReceivePeer(IPEndPoint ipEnd)
         {
-
+            peerTimers.Add(ipEnd.Address, 200);
         }
 
         public void UpdateClient(EndPoint sender)
         {
             EndPoint ipEnd = sender;
 
-            Console.WriteLine(ipEnd + ":peerIP");
+            foreach(var p in peerTimers)
+            {
+                if(p.Key == IPAddress.Parse(ipEnd.ToString().Split(':')[0]))
+                {
+                    peerTimers[p.Key] = 200;
+                }
+            }
         }
 
         private void CleanList(object sender, EventArgs e)
@@ -42,7 +49,19 @@ namespace NapsterProject
             {
                 countDown = 1;
 
-
+                foreach(var p in peerTimers)
+                {
+                    int value = p.Value;
+                    value--;
+                    if(value < 1)
+                    {
+                        peerTimers.Remove(p.Key);
+                    }
+                    else
+                    {
+                        peerTimers[p.Key] = value;
+                    }
+                }
             }
         }
     }
