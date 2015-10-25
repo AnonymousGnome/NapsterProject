@@ -63,6 +63,9 @@ namespace ClientFormProject
                  * The directory server as well as retrieves available peer
                  * info from the directory server.
                  */
+                string[] fileEntries = Directory.GetFiles(path);
+                foreach (string s in fileEntries)
+                    Console.WriteLine(s);
 
                 //starts hello message timer
                 timer.Start();

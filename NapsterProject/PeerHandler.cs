@@ -21,6 +21,7 @@ namespace NapsterProject
             this.path = path;
             timer = new System.Windows.Forms.Timer();
             timer.Tick += new EventHandler(CleanList);
+            peerTimers = new Dictionary<IPAddress, int>();
             timer.Interval = 1000;
             timer.Start();
         }
@@ -34,7 +35,7 @@ namespace NapsterProject
         {
             EndPoint ipEnd = sender;
 
-            foreach(var p in peerTimers)
+            foreach(KeyValuePair<IPAddress, int> p in peerTimers)
             {
                 if(p.Key == IPAddress.Parse(ipEnd.ToString().Split(':')[0]))
                 {
