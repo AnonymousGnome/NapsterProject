@@ -22,6 +22,7 @@ namespace NapsterProject
             timer = new System.Windows.Forms.Timer();
             timer.Tick += new EventHandler(CleanList);
             timer.Interval = 1000;
+            timer.Start();
         }
 
         public void ReceivePeer(IPEndPoint ipEnd)
