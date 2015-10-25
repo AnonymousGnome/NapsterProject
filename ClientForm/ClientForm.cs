@@ -82,5 +82,16 @@ namespace ClientFormProject
                 sockUDP.SendTo(helloMes, ipEnd);
             }
         }
+
+        private void disconnectButton_Click(object sender, EventArgs e)
+        {
+            timer.Stop();
+            countDown = 10;
+            registerButton.Enabled = true;
+            refreshButton.Enabled = false;
+            disconnectButton.Enabled = false;
+            errorLabel.Text = "Disconnected from server...";
+            fileBox.Items.Clear();
+        }
     }
 }

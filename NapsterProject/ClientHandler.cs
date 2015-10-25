@@ -54,10 +54,11 @@ namespace NapsterProject
         private void udpFunc()
         {
             byte[] data = new byte[2048];
+            
             //continually loops for thread's lifetime
             while (true)
             {
-                Console.Write("Waiting for client");
+                Console.WriteLine("Waiting for client");
                 IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
                 EndPoint Remote = (EndPoint)(sender);
                 int recv = socketUDP.ReceiveFrom(data, ref Remote);
