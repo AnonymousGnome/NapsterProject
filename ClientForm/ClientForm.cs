@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.IO;
 
 namespace ClientFormProject
 {
@@ -20,7 +21,9 @@ namespace ClientFormProject
         private int countDown = 10;
         private IPAddress hostIP;
         private IPEndPoint ipEnd;
+
         byte[] buffer, helloMes;
+        string path;
 
         public ClientForm()
         {
@@ -30,6 +33,8 @@ namespace ClientFormProject
             timer.Interval = 1000;
             helloMes = ASCIIEncoding.ASCII.GetBytes("Hello");
             messageLabel.Text = "";
+            path = @".\SharedFiles";
+            System.IO.Directory.CreateDirectory(path);
         }
 
         private void registerButton_Click(object sender, EventArgs e)
@@ -93,6 +98,14 @@ namespace ClientFormProject
             disconnectButton.Enabled = false;
             messageLabel.Text = "Disconnected from server...";
             fileBox.Items.Clear();
+        }
+
+        private void openDirecButton_Click(object sender, EventArgs e)
+        {
+            if (System.IO.Directory.Exists(path))
+                System.Diagnostics.Process.Start(path);
+            else
+                messageLabel.Text = "Cannot find folder SharedFiles...";
         }
     }
 }

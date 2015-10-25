@@ -121,6 +121,7 @@
             this.openDirecButton.TabIndex = 8;
             this.openDirecButton.Text = "Open Directory";
             this.openDirecButton.UseVisualStyleBackColor = true;
+            this.openDirecButton.Click += new System.EventHandler(this.openDirecButton_Click);
             // 
             // ClientForm
             // 
