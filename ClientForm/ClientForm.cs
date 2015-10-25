@@ -58,6 +58,11 @@ namespace ClientFormProject
                 registerButton.Enabled = false;
 
                 //sock.Send(buffer);
+                /*
+                 * This will send all file names in the SharedFiles folder to
+                 * The directory server as well as retrieves available peer
+                 * info from the directory server.
+                 */
 
                 //starts hello message timer
                 timer.Start();
@@ -75,7 +80,11 @@ namespace ClientFormProject
 
         private void refreshButton_Click(object sender, EventArgs e)
         {
-
+            /*
+             * This asks directory server to 
+             * send fresh info about registered 
+             * peers and available files for download
+             */
         }
 
         /*

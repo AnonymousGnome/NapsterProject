@@ -56,6 +56,7 @@ namespace NapsterProject
                     value--;
                     if(value < 1)
                     {
+                        Console.WriteLine("Removed {0} from list.", p.Key);
                         peerTimers.Remove(p.Key);
                     }
                     else

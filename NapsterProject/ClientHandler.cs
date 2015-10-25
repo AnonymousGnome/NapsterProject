@@ -18,8 +18,6 @@ namespace NapsterProject
 
         public ClientHandler()
         {
-            //Stores port numbers
-
             //Creates sockets for TCP and UDP listeners
             socketTCP = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socketUDP = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
@@ -82,6 +80,13 @@ namespace NapsterProject
             Socket tempSock = newSock as Socket; //retrieves socket from passed parameter
             byte[] buffer = new byte[2048]; //buffer for receiving info from client
             tempSock.Receive(buffer); //receives info from client
+
+            /*
+             * This will place client's available file info into 
+             * the directory file in the PeerDirectory folder
+             * and send the client the available info on registered
+             * peers (peer ips and files available to download)
+             */
             Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
         }
     }
