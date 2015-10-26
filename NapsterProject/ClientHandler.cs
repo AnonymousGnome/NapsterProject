@@ -101,6 +101,8 @@ namespace NapsterProject
                 }
             }
             Console.WriteLine(message);
+            buffer = ASCIIEncoding.ASCII.GetBytes(message);
+            tempSock.Send(buffer);
 
             /*
              * This will place client's available file info into 

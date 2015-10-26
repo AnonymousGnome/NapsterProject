@@ -21,6 +21,7 @@ namespace ClientFormProject
         private int countDown = 10; // seconds timer waits until send next message
         private IPAddress hostIP; // holds ip for the central directory server
         private IPEndPoint ipEnd; // endpoint for hello message to directory server
+        private Dictionary<string, string> peerFiles;
 
         byte[] buffer, helloMes; // bufferes for sending over network
         string path; // Filepath for shared files
@@ -35,6 +36,7 @@ namespace ClientFormProject
             messageLabel.Text = "";
             path = @".\SharedFiles";
             System.IO.Directory.CreateDirectory(path);
+            peerFiles = new Dictionary<string, string>();
         }
 
         private void registerButton_Click(object sender, EventArgs e)
@@ -42,14 +44,14 @@ namespace ClientFormProject
             buffer = new byte[2048];
 
             //creates sockets for TCP and UDP connections
-            sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            ConnectSocket();
+            
             sockUDP = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
             try
             {
                 //Takes input host ip address and establishes connection
-                hostIP = IPAddress.Parse(hostIPText.Text);
-                sock.Connect(hostIP, 9000);
+                
                 ipEnd = new IPEndPoint(hostIP, 9001);
 
                 //activates buttons
@@ -73,9 +75,21 @@ namespace ClientFormProject
 
                 buffer = ASCIIEncoding.ASCII.GetBytes(sendString);
                 sock.Send(buffer);
-                sock.Listen(10);
                 sock.Receive(buffer);
                 Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
+
+                string peers = ASCIIEncoding.ASCII.GetString(buffer);
+
+                foreach(string s in peers.Split('?'))
+                {
+                    string[] files = s.Split(';');
+                    for(int i = 1; i < files.Length; i++)
+                    {
+                        fileBox.Items.Add(files[i]);
+                        peerFiles.Add(files[i], files[0]);
+                    }
+                }
+                
                 sock.Dispose();
 
                 //starts hello message timer
@@ -127,6 +141,7 @@ namespace ClientFormProject
             disconnectButton.Enabled = false;
             messageLabel.Text = "Disconnected from server...";
             fileBox.Items.Clear();
+            peerFiles.Clear();
         }
 
         /*
@@ -138,6 +153,14 @@ namespace ClientFormProject
                 System.Diagnostics.Process.Start(path);
             else
                 messageLabel.Text = "Cannot find folder SharedFiles...";
+        }
+
+        private void ConnectSocket()
+        {
+            sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+            hostIP = IPAddress.Parse(hostIPText.Text);
+            sock.Connect(hostIP, 9000);
         }
     }
 }
