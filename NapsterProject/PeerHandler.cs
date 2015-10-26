@@ -89,7 +89,7 @@ namespace NapsterProject
                         }
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
 
                 }

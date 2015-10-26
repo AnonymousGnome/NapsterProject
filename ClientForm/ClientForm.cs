@@ -42,11 +42,9 @@ namespace ClientFormProject
             System.IO.Directory.CreateDirectory(path);
             peerFiles = new Dictionary<string, List<string>>();
 
-            
-
-            listenSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            listenSockEnd = new IPEndPoint(IPAddress.Any, 9002);
-            listenSock.Bind(listenSockEnd);
+            //listenSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            //listenSockEnd = new IPEndPoint(IPAddress.Any, 9002);
+            //listenSock.Bind(listenSockEnd);
         }
 
         private void registerButton_Click(object sender, EventArgs e)
@@ -54,14 +52,18 @@ namespace ClientFormProject
             buffer = new byte[2048];
 
             //creates sockets for TCP and UDP connections
+            sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             sockUDP = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
             try
             {
-                Console.WriteLine(PingHost("67.60.229.173"));
-                ConnectSocket(hostIP, 9000);
+                //ConnectSocket(hostIP, 9000);
                 //Takes input host ip address and establishes connection
+                hostIP = IPAddress.Parse(hostIPText.Text);
                 ipEnd = new IPEndPoint(hostIP, 9001);
+                
+                sock.Connect(hostIP, 9000);
+                //ipEnd = new IPEndPoint(hostIP, 9001);
 
                 //activates buttons
                 disconnectButton.Enabled = true;
@@ -90,36 +92,41 @@ namespace ClientFormProject
 
                 string peers = ASCIIEncoding.ASCII.GetString(buffer);
 
-                foreach(string s in peers.Split('?'))
+                foreach (string s in peers.Split('?'))
                 {
                     string[] files = s.Split(';');
                     List<string> temp = new List<string>();
-                    for(int i = 1; i < files.Length; i++)
+                    for (int i = 1; i < files.Length; i++)
                     {
                         fileBox.Items.Add(files[i] + "\t\t\t" + files[0]);
                         temp.Add(files[i]);
                     }
                     peerFiles.Add(files[0], temp);
                 }
-                
-                sock.Dispose();
+
+                sock.Shutdown(SocketShutdown.Both);
+                sock.Close();
 
                 //starts hello message timer
                 timer.Start();
-                StartListening();
+                //if(!listenSock.Connected)
+                //    StartListening();
             }
-            catch (SocketException socex)
-            {
-                messageLabel.Text = socex.Message;
-                //messageLabel.Text = "Error connecting to server...";
-            }
-            catch(ArgumentNullException n)
-            {
-                messageLabel.Text = "No host has been specified...";
-            }
+            //catch (SocketException socex)
+            //{
+            //    messageLabel.Text = socex.Message;
+            //    //messageLabel.Text = "Error connecting to server...";
+            //    Console.WriteLine(socex.Message);
+            //}
+            //catch (ArgumentNullException n)
+            //{
+            //    messageLabel.Text = "No host has been specified...";
+            //    Console.WriteLine(n.Message);
+            //}
             catch (Exception except)
             {
                 messageLabel.Text = except.Message;
+                Console.WriteLine(except.Message);
             }
         }
 
@@ -133,14 +140,14 @@ namespace ClientFormProject
 
             peerFiles.Clear();
             fileBox.Items.Clear();
-            ConnectSocket(hostIP, 9000);
+            //ConnectSocket(hostIP, 9000);
 
             string sendString = "REFRESH";
             buffer = ASCIIEncoding.ASCII.GetBytes(sendString);
-            sock.Send(buffer);
+            //sock.Send(buffer);
 
             buffer = new byte[2048];
-            sock.Receive(buffer);
+            //sock.Receive(buffer);
             //Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
 
             string peers = ASCIIEncoding.ASCII.GetString(buffer);
@@ -157,7 +164,8 @@ namespace ClientFormProject
                 peerFiles.Add(files[0], temp);
             }
 
-            sock.Dispose();
+            //sock.Shutdown(SocketShutdown.Both);
+            //sock.Close();
         }
 
         /*
@@ -179,14 +187,24 @@ namespace ClientFormProject
          */
         private void disconnectButton_Click(object sender, EventArgs e)
         {
-            timer.Stop();
-            countDown = 10;
-            registerButton.Enabled = true;
-            refreshButton.Enabled = false;
-            disconnectButton.Enabled = false;
-            messageLabel.Text = "Disconnected from server...";
-            fileBox.Items.Clear();
-            peerFiles.Clear();
+            try
+            {
+                timer.Stop();
+                countDown = 10;
+                registerButton.Enabled = true;
+                refreshButton.Enabled = false;
+                disconnectButton.Enabled = false;
+                messageLabel.Text = "Disconnected from server...";
+                fileBox.Items.Clear();
+                peerFiles.Clear();
+
+                sock.Shutdown(SocketShutdown.Both);
+                sock.Close();
+            }
+            catch (Exception ee)
+            {
+                Console.WriteLine(ee.Message);
+            }
         }
 
         /*
@@ -204,11 +222,13 @@ namespace ClientFormProject
         {
             try
             {
-                sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                //sock.Shutdown(SocketShutdown.Both);
+                //sock.Close();
+
                 hostIP = IPAddress.Parse(hostIPText.Text);
-                sock.Connect(hostIP, port);
+                //sock.Connect(hostIP, port);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e;
             }
@@ -222,14 +242,21 @@ namespace ClientFormProject
 
         void ListenFunc()
         {
-            //continually loops for thread's lifetime
-            while (true)
+            try
             {
-                listenSock.Listen(10); //puts into listening state
-                Socket newSock = listenSock.Accept(); //accepts incoming connection
-                Console.WriteLine("Incoming Connection on port 9000...");
-                Thread newCli = new Thread(new ParameterizedThreadStart(newCliFunc)); //generates new thread and socket for handling new client
-                newCli.Start(newSock); //starts thread and passes socket to thread function
+                //continually loops for thread's lifetime
+                while (true)
+                {
+                    listenSock.Listen(10); //puts into listening state
+                    Socket newSock = listenSock.Accept(); //accepts incoming connection
+                    Console.WriteLine("Incoming Connection on port 9000...");
+                    Thread newCli = new Thread(new ParameterizedThreadStart(newCliFunc)); //generates new thread and socket for handling new client
+                    newCli.Start(newSock); //starts thread and passes socket to thread function
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
         }
 
@@ -243,31 +270,30 @@ namespace ClientFormProject
 
         private void downloadButton_Click(object sender, EventArgs e)
         {
-
-
             try
             {
                 string ipKey = "";
                 string requestedFile = fileBox.SelectedItem.ToString();
-                foreach(var p in peerFiles)
+                foreach (var p in peerFiles)
                 {
-                    if(requestedFile.Contains(p.Key))
+                    if (requestedFile.Contains(p.Key))
                     {
                         ipKey = p.Key;
                     }
                 }
-                ConnectSocket(IPAddress.Parse(ipKey), 9002);
+                //ConnectSocket(IPAddress.Parse(ipKey), 9002);
 
                 buffer = new byte[2048];
 
                 buffer = ASCIIEncoding.ASCII.GetBytes(requestedFile);
-                sock.Send(buffer);
+                //sock.Send(buffer);
 
-                sock.Dispose();
+                //sock.Shutdown(SocketShutdown.Both);
+                //sock.Close();
             }
-            catch(Exception ee)
+            catch (Exception ee)
             {
-
+                Console.WriteLine(ee.Message);
             }
         }
 
