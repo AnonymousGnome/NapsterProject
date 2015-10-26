@@ -12,7 +12,8 @@ namespace NapsterProject
 {
     class ClientHandler
     {
-        private Socket socketTCP, socketUDP;
+        private TcpListener socketTCP;
+        private Socket socketUDP;
         private IPEndPoint ipEndPointTCP, ipEndPointUDP;
         private string path;
         private PeerHandler peerHandler;
@@ -20,13 +21,13 @@ namespace NapsterProject
         public ClientHandler()
         {
             //Creates sockets for TCP and UDP listeners
-            socketTCP = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socketTCP = new TcpListener(IPAddress.Any, 9000);
             socketUDP = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            ipEndPointTCP = new IPEndPoint(IPAddress.Any, 9000);
+            //ipEndPointTCP = new IPEndPoint(IPAddress.Any, 9000);
             ipEndPointUDP = new IPEndPoint(IPAddress.Any, 9001);
 
             //Binds sockets to ports
-            socketTCP.Bind(ipEndPointTCP);
+            //socketTCP.Bind(ipEndPointTCP);
             socketUDP.Bind(ipEndPointUDP);
 
             //Creates directory for storing registered peers
@@ -51,8 +52,8 @@ namespace NapsterProject
             //continually loops for thread's lifetime
             while (true)
             {
-                socketTCP.Listen(10); //puts into listening state
-                Socket newSock = socketTCP.Accept(); //accepts incoming connection
+                socketTCP.Start(10); //puts into listening state
+                Socket newSock = socketTCP.AcceptSocket(); //accepts incoming connection
                 Console.WriteLine("Incoming Connection on port 9000...");
                 Thread newCli = new Thread(new ParameterizedThreadStart(newCliFunc)); //generates new thread and socket for handling new client
                 newCli.Start(newSock); //starts thread and passes socket to thread function

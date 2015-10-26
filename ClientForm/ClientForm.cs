@@ -11,6 +11,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.IO;
+using System.Net.NetworkInformation;
 
 namespace ClientFormProject
 {
@@ -41,6 +42,8 @@ namespace ClientFormProject
             System.IO.Directory.CreateDirectory(path);
             peerFiles = new Dictionary<string, List<string>>();
 
+            
+
             listenSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             listenSockEnd = new IPEndPoint(IPAddress.Any, 9002);
             listenSock.Bind(listenSockEnd);
@@ -55,6 +58,7 @@ namespace ClientFormProject
 
             try
             {
+                Console.WriteLine(PingHost("67.60.229.173"));
                 ConnectSocket(hostIP, 9000);
                 //Takes input host ip address and establishes connection
                 ipEnd = new IPEndPoint(hostIP, 9001);
@@ -265,6 +269,22 @@ namespace ClientFormProject
             {
 
             }
+        }
+
+        public static bool PingHost(string nameOrAddress)
+        {
+            bool pingable = false;
+            Ping pinger = new Ping();
+            try
+            {
+                PingReply reply = pinger.Send(nameOrAddress);
+                pingable = reply.Status == IPStatus.Success;
+            }
+            catch (PingException)
+            {
+                // Discard PingExceptions and return false;
+            }
+            return pingable;
         }
     }
 }
