@@ -44,12 +44,11 @@ namespace ClientFormProject
             buffer = new byte[2048];
 
             //creates sockets for TCP and UDP connections
-            
-            ConnectSocket(hostIP);
             sockUDP = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
             try
             {
+                ConnectSocket(hostIP);
                 //Takes input host ip address and establishes connection
                 
                 ipEnd = new IPEndPoint(hostIP, 9001);
@@ -97,8 +96,12 @@ namespace ClientFormProject
             }
             catch (SocketException socex)
             {
-                messageLabel.Text = socex.Message;
-                //errorLabel.Text = "Error connecting to server...";
+                //messageLabel.Text = socex.Message;
+                messageLabel.Text = "Error connecting to server...";
+            }
+            catch(ArgumentNullException n)
+            {
+                messageLabel.Text = "No host has been specified...";
             }
             catch (Exception except)
             {
@@ -123,7 +126,7 @@ namespace ClientFormProject
 
             buffer = new byte[2048];
             sock.Receive(buffer);
-            Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
+            //Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
 
             string peers = ASCIIEncoding.ASCII.GetString(buffer);
 
@@ -182,9 +185,16 @@ namespace ClientFormProject
 
         private void ConnectSocket(IPAddress ip)
         {
-            sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            hostIP = IPAddress.Parse(hostIPText.Text);
-            sock.Connect(hostIP, 9000);
+            try
+            {
+                sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                hostIP = IPAddress.Parse(hostIPText.Text);
+                sock.Connect(hostIP, 9000);
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
         }
     }
 }
