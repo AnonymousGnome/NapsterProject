@@ -120,7 +120,6 @@ namespace NapsterProject
             string message = "";
             foreach (FileInfo file in peers.GetFiles())
             {
-                Console.WriteLine(file.Name + " " + ipString);
                 if (file.Name != ipString + ".txt")
                 {
                     message += file.Name.Substring(0,file.Name.LastIndexOf('.')) + ";";
@@ -130,6 +129,8 @@ namespace NapsterProject
                         message += sr.ReadLine() + ";";
                     }
                     message += "?";
+
+                    sr.Close();
                 }
             }
             return message;

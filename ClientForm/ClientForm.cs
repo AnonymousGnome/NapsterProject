@@ -21,7 +21,7 @@ namespace ClientFormProject
         private int countDown = 10; // seconds timer waits until send next message
         private IPAddress hostIP; // holds ip for the central directory server
         private IPEndPoint ipEnd, listenSockEnd; // endpoints for hello message to directory server and listening socket
-        private Dictionary<string, string> peerFiles;
+        private Dictionary<string, List<string>> peerFiles;
 
         byte[] buffer, helloMes; // bufferes for sending over network
         string path; // Filepath for shared files
@@ -39,7 +39,7 @@ namespace ClientFormProject
 
             path = @".\SharedFiles";
             System.IO.Directory.CreateDirectory(path);
-            peerFiles = new Dictionary<string, string>();
+            peerFiles = new Dictionary<string, List<string>>();
 
             listenSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             listenSockEnd = new IPEndPoint(IPAddress.Any, 9002);
@@ -80,6 +80,7 @@ namespace ClientFormProject
 
                 buffer = ASCIIEncoding.ASCII.GetBytes(sendString);
                 sock.Send(buffer);
+                buffer = new byte[2048];
                 sock.Receive(buffer);
                 Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
 
@@ -88,11 +89,13 @@ namespace ClientFormProject
                 foreach(string s in peers.Split('?'))
                 {
                     string[] files = s.Split(';');
+                    List<string> temp = new List<string>();
                     for(int i = 1; i < files.Length; i++)
                     {
                         fileBox.Items.Add(files[i] + "\t\t\t" + files[0]);
-                        peerFiles.Add(files[i], files[0]);
+                        temp.Add(files[i]);
                     }
+                    peerFiles.Add(files[0], temp);
                 }
                 
                 sock.Dispose();
@@ -103,8 +106,8 @@ namespace ClientFormProject
             }
             catch (SocketException socex)
             {
-                //messageLabel.Text = socex.Message;
-                messageLabel.Text = "Error connecting to server...";
+                messageLabel.Text = socex.Message;
+                //messageLabel.Text = "Error connecting to server...";
             }
             catch(ArgumentNullException n)
             {
@@ -123,6 +126,7 @@ namespace ClientFormProject
              * send fresh info about registered 
              * peers and available files for download
              */
+
             peerFiles.Clear();
             fileBox.Items.Clear();
             ConnectSocket(hostIP, 9000);
@@ -140,11 +144,13 @@ namespace ClientFormProject
             foreach (string s in peers.Split('?'))
             {
                 string[] files = s.Split(';');
+                List<string> temp = new List<string>();
                 for (int i = 1; i < files.Length; i++)
                 {
                     fileBox.Items.Add(files[i] + "\t\t\t" + files[0]);
-                    peerFiles.Add(files[i], files[0]);
+                    temp.Add(files[i]);
                 }
+                peerFiles.Add(files[0], temp);
             }
 
             sock.Dispose();
@@ -237,16 +243,16 @@ namespace ClientFormProject
 
             try
             {
-                string ipValue = "";
+                string ipKey = "";
                 string requestedFile = fileBox.SelectedItem.ToString();
                 foreach(var p in peerFiles)
                 {
-                    if(p.Key == requestedFile)
+                    if(requestedFile.Contains(p.Key))
                     {
-                        ipValue = p.Value;
+                        ipKey = p.Key;
                     }
                 }
-                ConnectSocket(IPAddress.Parse(ipValue), 9002);
+                ConnectSocket(IPAddress.Parse(ipKey), 9002);
 
                 buffer = new byte[2048];
 
