@@ -82,24 +82,15 @@ namespace NapsterProject
             byte[] buffer = new byte[2048]; //buffer for receiving info from client
             peerHandler.ReceivePeer(tempSock.RemoteEndPoint);
             int size = tempSock.Receive(buffer); //receives info from client
-            char[] delimiters = { ';' };
-            addToFileList(new List<string>(Encoding.ASCII.GetString(buffer, 0, size).Split(delimiters)), tempSock.RemoteEndPoint);
-
-            DirectoryInfo peers = new DirectoryInfo(path);
-            string ipString = tempSock.RemoteEndPoint.ToString().Split(':')[0];
-            string message = ipString + ";";
-            foreach(FileInfo file in peers.GetFiles())
+            //Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
+            if (!ASCIIEncoding.ASCII.GetString(buffer).Contains("REFRESH"))
             {
-                if (file.Name != ipString + ".txt")
-                {
-                    StreamReader sr = new StreamReader(path + "\\" + file.Name);
-                    while (sr.Peek() != -1)
-                    {
-                        message += sr.ReadLine() + ";";
-                    }
-                    message += "?";
-                }
+                char[] delimiters = { ';' };
+                addToFileList(new List<string>(Encoding.ASCII.GetString(buffer, 0, size).Split(delimiters)), tempSock.RemoteEndPoint);
             }
+
+            string message = compilePeers(tempSock);
+            
             Console.WriteLine(message);
             buffer = ASCIIEncoding.ASCII.GetBytes(message);
             tempSock.Send(buffer);
@@ -117,9 +108,31 @@ namespace NapsterProject
         private void addToFileList(List<string> files, EndPoint endPoint)
         {
             string directoryFile = @".\PeerDirectory\" + endPoint.ToString().Split(':')[0] + ".txt"; // The file where we want to save the client/file informaiton
-            Console.WriteLine(directoryFile);
+            //Console.WriteLine(directoryFile);
             File.WriteAllLines(directoryFile, files); // Write all the data in the list to the file.
             // Save the list of files from the client to the directory.
+        }
+
+        private string compilePeers(Socket tempSock)
+        {
+            DirectoryInfo peers = new DirectoryInfo(path);
+            string ipString = tempSock.RemoteEndPoint.ToString().Split(':')[0];
+            string message = "";
+            foreach (FileInfo file in peers.GetFiles())
+            {
+                Console.WriteLine(file.Name + " " + ipString);
+                if (file.Name != ipString + ".txt")
+                {
+                    message += file.Name.Substring(0,file.Name.LastIndexOf('.')) + ";";
+                    StreamReader sr = new StreamReader(path + "\\" + file.Name);
+                    while (sr.Peek() != -1)
+                    {
+                        message += sr.ReadLine() + ";";
+                    }
+                    message += "?";
+                }
+            }
+            return message;
         }
     }
 }

@@ -44,8 +44,8 @@ namespace ClientFormProject
             buffer = new byte[2048];
 
             //creates sockets for TCP and UDP connections
-            ConnectSocket();
             
+            ConnectSocket(hostIP);
             sockUDP = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
             try
@@ -85,7 +85,7 @@ namespace ClientFormProject
                     string[] files = s.Split(';');
                     for(int i = 1; i < files.Length; i++)
                     {
-                        fileBox.Items.Add(files[i]);
+                        fileBox.Items.Add(files[i] + "\t\t\t" + files[0]);
                         peerFiles.Add(files[i], files[0]);
                     }
                 }
@@ -113,6 +113,31 @@ namespace ClientFormProject
              * send fresh info about registered 
              * peers and available files for download
              */
+            peerFiles.Clear();
+            fileBox.Items.Clear();
+            ConnectSocket(hostIP);
+
+            string sendString = "REFRESH";
+            buffer = ASCIIEncoding.ASCII.GetBytes(sendString);
+            sock.Send(buffer);
+
+            buffer = new byte[2048];
+            sock.Receive(buffer);
+            Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
+
+            string peers = ASCIIEncoding.ASCII.GetString(buffer);
+
+            foreach (string s in peers.Split('?'))
+            {
+                string[] files = s.Split(';');
+                for (int i = 1; i < files.Length; i++)
+                {
+                    fileBox.Items.Add(files[i] + "\t\t\t" + files[0]);
+                    peerFiles.Add(files[i], files[0]);
+                }
+            }
+
+            sock.Dispose();
         }
 
         /*
@@ -155,10 +180,9 @@ namespace ClientFormProject
                 messageLabel.Text = "Cannot find folder SharedFiles...";
         }
 
-        private void ConnectSocket()
+        private void ConnectSocket(IPAddress ip)
         {
             sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
             hostIP = IPAddress.Parse(hostIPText.Text);
             sock.Connect(hostIP, 9000);
         }
