@@ -233,19 +233,20 @@ namespace ClientFormProject
 
         private void downloadButton_Click(object sender, EventArgs e)
         {
-            IPAddress peerIP;
-            string requestedFile = fileBox.SelectedItem.ToString();
-            foreach(var p in peerFiles)
-            {
-                if(p.Key == requestedFile)
-                {
-                    peerIP = IPAddress.Parse(p.Value);
-                }
-            }
+
 
             try
             {
-                ConnectSocket(peerIP, 9002);
+                string ipValue = "";
+                string requestedFile = fileBox.SelectedItem.ToString();
+                foreach(var p in peerFiles)
+                {
+                    if(p.Key == requestedFile)
+                    {
+                        ipValue = p.Value;
+                    }
+                }
+                ConnectSocket(IPAddress.Parse(ipValue), 9002);
 
                 buffer = new byte[2048];
 
@@ -254,7 +255,7 @@ namespace ClientFormProject
 
                 sock.Dispose();
             }
-            catch(Exception e)
+            catch(Exception ee)
             {
 
             }
