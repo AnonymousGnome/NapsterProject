@@ -85,14 +85,31 @@ namespace NapsterProject
             char[] delimiters = { ';' };
             addToFileList(new List<string>(Encoding.ASCII.GetString(buffer, 0, size).Split(delimiters)), tempSock.RemoteEndPoint);
 
+            DirectoryInfo peers = new DirectoryInfo(path);
+            string ipString = tempSock.RemoteEndPoint.ToString().Split(':')[0];
+            string message = ipString + ";";
+            foreach(FileInfo file in peers.GetFiles())
+            {
+                if (file.Name != ipString + ".txt")
+                {
+                    StreamReader sr = new StreamReader(path + "\\" + file.Name);
+                    while (sr.Peek() != -1)
+                    {
+                        message += sr.ReadLine() + ";";
+                    }
+                    message += "?";
+                }
+            }
+            Console.WriteLine(message);
+
             /*
              * This will place client's available file info into 
              * the directory file in the PeerDirectory folder
              * and send the client the available info on registered
              * peers (peer ips and files available to download)
              */
-            string message = ASCIIEncoding.ASCII.GetString(buffer);
-            Console.WriteLine(message.Substring(0, message.LastIndexOf(';')));
+            //message = ASCIIEncoding.ASCII.GetString(buffer);
+            //Console.WriteLine(message.Substring(0, message.LastIndexOf(';')));
         }
 
         private void addToFileList(List<string> files, EndPoint endPoint)

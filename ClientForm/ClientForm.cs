@@ -73,6 +73,9 @@ namespace ClientFormProject
 
                 buffer = ASCIIEncoding.ASCII.GetBytes(sendString);
                 sock.Send(buffer);
+                sock.Listen(10);
+                sock.Receive(buffer);
+                Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
                 sock.Dispose();
 
                 //starts hello message timer

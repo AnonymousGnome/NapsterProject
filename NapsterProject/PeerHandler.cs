@@ -57,7 +57,7 @@ namespace NapsterProject
          */
         void CleanList(object o)
         {
-            Console.WriteLine("Cleaning list...");
+            //Console.WriteLine("Cleaning list...");
             countDown--;
             if (countDown < 1)
             {
@@ -69,8 +69,7 @@ namespace NapsterProject
                         int value = p.Value;
                         value--;
                         Console.WriteLine("New value: {0}", value);
-                        Console.WriteLine("Old Value: {0}", p.Value);
-                        Console.WriteLine(p.Value);
+                        //Console.WriteLine("Old Value: {0}", p.Value);
                         if (value < 1)
                         {
                             Console.WriteLine("Removed {0} from list.", p.Key);
@@ -81,10 +80,6 @@ namespace NapsterProject
                                 if(file.Name == p.Key.ToString() + ".txt")
                                     file.Delete();
                             }
-                            //foreach (DirectoryInfo dir in downloadedMessageInfo.GetDirectories())
-                            //{
-                            //    dir.Delete(true);
-                            //}
                             int i;
                             peerTimers.TryRemove(p.Key, out i);
                         }
