@@ -55,7 +55,7 @@ namespace ClientFormProject
 
             try
             {
-                ConnectSocket(hostIP);
+                ConnectSocket(hostIP, 9000);
                 //Takes input host ip address and establishes connection
                 ipEnd = new IPEndPoint(hostIP, 9001);
 
@@ -125,7 +125,7 @@ namespace ClientFormProject
              */
             peerFiles.Clear();
             fileBox.Items.Clear();
-            ConnectSocket(hostIP);
+            ConnectSocket(hostIP, 9000);
 
             string sendString = "REFRESH";
             buffer = ASCIIEncoding.ASCII.GetBytes(sendString);
@@ -190,13 +190,13 @@ namespace ClientFormProject
                 messageLabel.Text = "Cannot find folder SharedFiles...";
         }
 
-        private void ConnectSocket(IPAddress ip)
+        private void ConnectSocket(IPAddress ip, int port)
         {
             try
             {
                 sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 hostIP = IPAddress.Parse(hostIPText.Text);
-                sock.Connect(hostIP, 9000);
+                sock.Connect(hostIP, port);
             }
             catch(Exception e)
             {
@@ -229,6 +229,35 @@ namespace ClientFormProject
             Socket tempSock = newSock as Socket;
             tempSock.Receive(buffer);
             Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
+        }
+
+        private void downloadButton_Click(object sender, EventArgs e)
+        {
+            IPAddress peerIP;
+            string requestedFile = fileBox.SelectedItem.ToString();
+            foreach(var p in peerFiles)
+            {
+                if(p.Key == requestedFile)
+                {
+                    peerIP = IPAddress.Parse(p.Value);
+                }
+            }
+
+            try
+            {
+                ConnectSocket(peerIP, 9002);
+
+                buffer = new byte[2048];
+
+                buffer = ASCIIEncoding.ASCII.GetBytes(requestedFile);
+                sock.Send(buffer);
+
+                sock.Dispose();
+            }
+            catch(Exception e)
+            {
+
+            }
         }
     }
 }
