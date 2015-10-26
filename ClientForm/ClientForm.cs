@@ -16,11 +16,11 @@ namespace ClientFormProject
 {
     public partial class ClientForm : Form
     {
-        private Socket sock, sockUDP; // sockets for connecting to directory server
+        private Socket sock, sockUDP, listenSock; // sockets for connecting to directory server
         private System.Windows.Forms.Timer timer; // timer for UDP hello message
         private int countDown = 10; // seconds timer waits until send next message
         private IPAddress hostIP; // holds ip for the central directory server
-        private IPEndPoint ipEnd; // endpoint for hello message to directory server
+        private IPEndPoint ipEnd, listenSockEnd; // endpoints for hello message to directory server and listening socket
         private Dictionary<string, string> peerFiles;
 
         byte[] buffer, helloMes; // bufferes for sending over network
@@ -29,14 +29,20 @@ namespace ClientFormProject
         public ClientForm()
         {
             InitializeComponent();
+
             timer = new System.Windows.Forms.Timer();
             timer.Tick += new EventHandler(timerFunc);
             timer.Interval = 1000;
+
             helloMes = ASCIIEncoding.ASCII.GetBytes("Hello");
             messageLabel.Text = "";
+
             path = @".\SharedFiles";
             System.IO.Directory.CreateDirectory(path);
             peerFiles = new Dictionary<string, string>();
+
+            listenSockEnd = new IPEndPoint(IPAddress.Any, 9002);
+            listenSock.Bind(listenSockEnd);
         }
 
         private void registerButton_Click(object sender, EventArgs e)
@@ -44,13 +50,13 @@ namespace ClientFormProject
             buffer = new byte[2048];
 
             //creates sockets for TCP and UDP connections
+            listenSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             sockUDP = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
             try
             {
                 ConnectSocket(hostIP);
                 //Takes input host ip address and establishes connection
-                
                 ipEnd = new IPEndPoint(hostIP, 9001);
 
                 //activates buttons
@@ -93,6 +99,7 @@ namespace ClientFormProject
 
                 //starts hello message timer
                 timer.Start();
+                StartListening();
             }
             catch (SocketException socex)
             {
@@ -195,6 +202,33 @@ namespace ClientFormProject
             {
                 throw e;
             }
+        }
+
+        private void StartListening()
+        {
+            Thread listenThread = new Thread(ListenFunc);
+            listenThread.Start();
+        }
+
+        void ListenFunc()
+        {
+            //continually loops for thread's lifetime
+            while (true)
+            {
+                listenSock.Listen(10); //puts into listening state
+                Socket newSock = listenSock.Accept(); //accepts incoming connection
+                Console.WriteLine("Incoming Connection on port 9000...");
+                Thread newCli = new Thread(new ParameterizedThreadStart(newCliFunc)); //generates new thread and socket for handling new client
+                newCli.Start(newSock); //starts thread and passes socket to thread function
+            }
+        }
+
+        void newCliFunc(object newSock)
+        {
+            byte[] buffer = new byte[2048];
+            Socket tempSock = newSock as Socket;
+            tempSock.Receive(buffer);
+            Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
         }
     }
 }
