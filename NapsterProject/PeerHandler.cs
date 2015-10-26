@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Collections.Concurrent;
+using System.IO;
 
 namespace NapsterProject
 {
@@ -73,6 +74,17 @@ namespace NapsterProject
                         if (value < 1)
                         {
                             Console.WriteLine("Removed {0} from list.", p.Key);
+                            DirectoryInfo peers = new DirectoryInfo(path);
+
+                            foreach (FileInfo file in peers.GetFiles())
+                            {
+                                if(file.Name == p.Key.ToString() + ".txt")
+                                    file.Delete();
+                            }
+                            //foreach (DirectoryInfo dir in downloadedMessageInfo.GetDirectories())
+                            //{
+                            //    dir.Delete(true);
+                            //}
                             int i;
                             peerTimers.TryRemove(p.Key, out i);
                         }
