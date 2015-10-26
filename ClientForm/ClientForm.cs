@@ -41,6 +41,7 @@ namespace ClientFormProject
             System.IO.Directory.CreateDirectory(path);
             peerFiles = new Dictionary<string, string>();
 
+            listenSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             listenSockEnd = new IPEndPoint(IPAddress.Any, 9002);
             listenSock.Bind(listenSockEnd);
         }
@@ -50,7 +51,6 @@ namespace ClientFormProject
             buffer = new byte[2048];
 
             //creates sockets for TCP and UDP connections
-            listenSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             sockUDP = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
             try
