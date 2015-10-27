@@ -38,6 +38,7 @@
             this.downloadButton = new System.Windows.Forms.Button();
             this.openDirecButton = new System.Windows.Forms.Button();
             this.portText = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // registerButton
@@ -128,16 +129,27 @@
             // 
             // portText
             // 
-            this.portText.Location = new System.Drawing.Point(259, 28);
+            this.portText.Location = new System.Drawing.Point(196, 28);
             this.portText.Name = "portText";
-            this.portText.Size = new System.Drawing.Size(100, 20);
+            this.portText.Size = new System.Drawing.Size(129, 20);
             this.portText.TabIndex = 9;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(193, 9);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(111, 13);
+            this.label2.TabIndex = 10;
+            this.label2.Text = "Listening Port Number";
+            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // ClientForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(826, 462);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.portText);
             this.Controls.Add(this.openDirecButton);
             this.Controls.Add(this.downloadButton);
@@ -167,5 +179,6 @@
         private System.Windows.Forms.Button downloadButton;
         private System.Windows.Forms.Button openDirecButton;
         private System.Windows.Forms.TextBox portText;
+        private System.Windows.Forms.Label label2;
     }
 }

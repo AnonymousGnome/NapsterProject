@@ -19,7 +19,7 @@ namespace ClientFormProject
     {
         private Socket sock, sockUDP, listenSock; // sockets for connecting to directory server
         private System.Windows.Forms.Timer timer; // timer for UDP hello message
-        private int countDown = 10; // seconds timer waits until send next message
+        private int countDown = 60; // seconds timer waits until send next message
         private IPAddress hostIP; // holds ip for the central directory server
         private IPEndPoint ipEnd, listenSockEnd; // endpoints for hello message to directory server and listening socket
         private int listenPort;
@@ -31,6 +31,7 @@ namespace ClientFormProject
         {
             InitializeComponent();
 
+            //timer for UDP hello message
             timer = new System.Windows.Forms.Timer();
             timer.Tick += new EventHandler(timerFunc);
             timer.Interval = 1000;
@@ -38,6 +39,7 @@ namespace ClientFormProject
             helloMes = ASCIIEncoding.ASCII.GetBytes("Hello");
             messageLabel.Text = "";
 
+            //Creates required directory
             path = @".\SharedFiles";
             System.IO.Directory.CreateDirectory(path);
 
@@ -324,6 +326,11 @@ namespace ClientFormProject
                 // Discard PingExceptions and return false;
             }
             return pingable;
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
