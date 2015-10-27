@@ -27,7 +27,7 @@ namespace NapsterProject
             TimerCallback callback = new TimerCallback(CleanList);
             timer = new Timer(callback, null, 0, 1000);
             peerTimers = new ConcurrentDictionary<IPAddress, int>();
-            timeToWait = 30;
+            timeToWait = 200;
         }
 
         /*
@@ -57,7 +57,6 @@ namespace NapsterProject
          */
         void CleanList(object o)
         {
-            //Console.WriteLine("Cleaning list...");
             countDown--;
             if (countDown < 1)
             {
@@ -68,24 +67,22 @@ namespace NapsterProject
                     {
                         int value = p.Value;
                         value--;
-                        Console.WriteLine("New value: {0}", value);
-                        //Console.WriteLine("Old Value: {0}", p.Value);
                         if (value < 1)
                         {
-                            Console.WriteLine("Removed {0} from list.", p.Key);
-                            DirectoryInfo peers = new DirectoryInfo(path);
+                            Console.WriteLine("Removed {0} from list.", p.Key); // alerts when peer is removed from registry
+                            DirectoryInfo peers = new DirectoryInfo(path); // finds registry files
 
                             foreach (FileInfo file in peers.GetFiles())
                             {
                                 if(file.Name == p.Key.ToString() + ".txt")
-                                    file.Delete();
+                                    file.Delete(); // deletes peer with expired timer
                             }
                             int i;
                             peerTimers.TryRemove(p.Key, out i);
                         }
                         else
                         {
-                            peerTimers[p.Key] = value;
+                            peerTimers[p.Key] = value; // updates peer timer
                         }
                     }
                 }

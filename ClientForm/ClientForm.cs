@@ -65,9 +65,7 @@ namespace ClientFormProject
                 ipEnd = new IPEndPoint(hostIP, 9001);
                 listenSockEnd = new IPEndPoint(IPAddress.Any, listenPort);
                 listenSock.Bind(listenSockEnd);
-                
                 sock.Connect(hostIP, 9000);
-                //ipEnd = new IPEndPoint(hostIP, 9001);
 
                 //activates buttons
                 disconnectButton.Enabled = true;
@@ -87,6 +85,9 @@ namespace ClientFormProject
                     sendString +=  temp[temp.Length - 1] + ";";
                 }
 
+                /*
+                 * Populates list box with recieved peer info
+                 */
                 buffer = ASCIIEncoding.ASCII.GetBytes(sendString);
                 sock.Send(buffer);
                 buffer = new byte[2048];
@@ -103,25 +104,25 @@ namespace ClientFormProject
                     }
                 }
 
+                //closes connection
                 sock.Shutdown(SocketShutdown.Both);
                 sock.Close();
 
                 //starts hello message timer
                 timer.Start();
-                //if(!listenSock.Connected)
                 StartListening();
             }
-            //catch (SocketException socex)
-            //{
-            //    messageLabel.Text = socex.Message;
-            //    //messageLabel.Text = "Error connecting to server...";
-            //    Console.WriteLine(socex.Message);
-            //}
-            //catch (ArgumentNullException n)
-            //{
-            //    messageLabel.Text = "No host has been specified...";
-            //    Console.WriteLine(n.Message);
-            //}
+            catch (SocketException socex)
+            {
+                messageLabel.Text = socex.Message;
+                messageLabel.Text = "Error connecting to server...";
+                Console.WriteLine(socex.Message);
+            }
+            catch (ArgumentNullException n)
+            {
+                messageLabel.Text = "No host has been specified...";
+                Console.WriteLine(n.Message);
+            }
             catch (Exception except)
             {
                 messageLabel.Text = except.Message;
@@ -137,7 +138,6 @@ namespace ClientFormProject
              * peers and available files for download
              */
             fileBox.Items.Clear();
-            //ConnectSocket(hostIP, 9000);
 
             string sendString = "REFRESH";
             buffer = ASCIIEncoding.ASCII.GetBytes(sendString);
@@ -213,22 +213,6 @@ namespace ClientFormProject
                 messageLabel.Text = "Cannot find folder SharedFiles...";
         }
 
-        private void ConnectSocket(IPAddress ip, int port)
-        {
-            try
-            {
-                //sock.Shutdown(SocketShutdown.Both);
-                //sock.Close();
-
-                hostIP = IPAddress.Parse(hostIPText.Text);
-                //sock.Connect(hostIP, port);
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-        }
-
         private void StartListening()
         {
             Thread listenThread = new Thread(ListenFunc);
@@ -255,26 +239,27 @@ namespace ClientFormProject
             }
         }
 
+        /*
+         * Function for handling new clients
+         */
         void newCliFunc(object newSock)
         {
             try
             {
-                string dir = Directory.GetCurrentDirectory() + @"\SharedFiles";
-                Socket tempSock = newSock as Socket;
-                tempSock.Receive(buffer);
-                buffer = new byte[Int32.Parse(ASCIIEncoding.ASCII.GetString(buffer))];
-                tempSock.Receive(buffer);
-                messageLabel.Text = dir + @"\" + ASCIIEncoding.ASCII.GetString(buffer).Trim();
-                string filePath = dir + @"\" + ASCIIEncoding.ASCII.GetString(buffer).Trim();
-                FindIllegalPathChars(@filePath);
-                byte[] bytes = System.IO.File.ReadAllBytes(@filePath);
-                string size = bytes.Length.ToString();
-                tempSock.Send(ASCIIEncoding.ASCII.GetBytes(size));
-                tempSock.Send(bytes);
+                string dir = Directory.GetCurrentDirectory() + @"\SharedFiles"; // full directory for shared files folder
+                Socket tempSock = newSock as Socket; // temporary socket reference
+                tempSock.Receive(buffer); // receieves size of incoming data
+                buffer = new byte[Int32.Parse(ASCIIEncoding.ASCII.GetString(buffer))]; // creates buffer of size
+                tempSock.Receive(buffer); // recieves incoming data
+                string filePath = dir + @"\" + ASCIIEncoding.ASCII.GetString(buffer).Trim(); // appends filename to directory
+                byte[] bytes = System.IO.File.ReadAllBytes(@filePath); // Reads all bytes from file
+                string size = bytes.Length.ToString(); // size of outgoing file
+                tempSock.Send(ASCIIEncoding.ASCII.GetBytes(size)); // sends size to client
+                tempSock.Send(bytes); // sends file to client
             }
             catch(Exception e)
             {
-                messageLabel.Text = e.Message + ":1";
+                messageLabel.Text = e.Message;
             }
         }
 
@@ -283,9 +268,9 @@ namespace ClientFormProject
             Socket peerSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
             {
-                string[] requestedFileArray = fileBox.SelectedItem.ToString().Split('\t');
+                string[] requestedFileArray = fileBox.SelectedItem.ToString().Split('\t'); // takes requested file info from listbox
 
-                peerSock.Connect(IPAddress.Parse(requestedFileArray[3].Split('_')[0]), Int32.Parse(requestedFileArray[3].Split('_')[1]));
+                peerSock.Connect(IPAddress.Parse(requestedFileArray[3].Split('_')[0]), Int32.Parse(requestedFileArray[3].Split('_')[1])); // connects to peer
 
                 buffer = new byte[2048];
 
@@ -293,17 +278,17 @@ namespace ClientFormProject
                 {
                     messageLabel.Text = "Client connected. Starting to receive the file";
 
-                    byte[] bytes = ASCIIEncoding.ASCII.GetBytes(requestedFileArray[0]);
-                    string size = bytes.Length.ToString();
-                    peerSock.Send(ASCIIEncoding.ASCII.GetBytes(size));
-                    peerSock.Send(bytes);
+                    byte[] bytes = ASCIIEncoding.ASCII.GetBytes(requestedFileArray[0]); // creates byte array of requested file
+                    string size = bytes.Length.ToString(); // size of request
+                    peerSock.Send(ASCIIEncoding.ASCII.GetBytes(size)); //sends size of request
+                    peerSock.Send(bytes); //sends request
 
-                    peerSock.Receive(buffer);
-                    //messageLabel.Text = ASCIIEncoding.ASCII.GetString(buffer);
-                    buffer = new byte[Int32.Parse(ASCIIEncoding.ASCII.GetString(buffer))];
-                    peerSock.Receive(buffer);
-                    File.WriteAllBytes(path + "\\" + requestedFileArray[0], buffer);
+                    peerSock.Receive(buffer); // receieves size of file
+                    buffer = new byte[Int32.Parse(ASCIIEncoding.ASCII.GetString(buffer))]; // creates buffer size of file
+                    peerSock.Receive(buffer); // receieves file
+                    File.WriteAllBytes(path + "\\" + requestedFileArray[0], buffer); // recontructs file locally
 
+                    //closes socket
                     peerSock.Shutdown(SocketShutdown.Both);
                     peerSock.Close();
                 }
@@ -316,38 +301,9 @@ namespace ClientFormProject
             }
         }
 
-        public static bool PingHost(string nameOrAddress)
-        {
-            bool pingable = false;
-            Ping pinger = new Ping();
-            try
-            {
-                PingReply reply = pinger.Send(nameOrAddress);
-                pingable = reply.Status == IPStatus.Success;
-            }
-            catch (PingException)
-            {
-                // Discard PingExceptions and return false;
-            }
-            return pingable;
-        }
-
         private void label2_Click(object sender, EventArgs e)
         {
 
-        }
-        void FindIllegalPathChars(string path)
-        {
-            int index = -1;
-            do
-            {
-                index = path.IndexOfAny(Path.GetInvalidPathChars(), index + 1);
-                if (index > -1)
-                {
-                    messageLabel.Text = String.Format("Invalid char \"{0}\" at position {1}",  index, path[index]);
-                }
-
-            } while (index > -1);
         }
     }
 

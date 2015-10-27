@@ -23,11 +23,9 @@ namespace NapsterProject
             //Creates sockets for TCP and UDP listeners
             socketTCP = new TcpListener(IPAddress.Any, 9000);
             socketUDP = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            //ipEndPointTCP = new IPEndPoint(IPAddress.Any, 9000);
             ipEndPointUDP = new IPEndPoint(IPAddress.Any, 9001);
 
             //Binds sockets to ports
-            //socketTCP.Bind(ipEndPointTCP);
             socketUDP.Bind(ipEndPointUDP);
 
             //Creates directory for storing registered peers
@@ -71,20 +69,24 @@ namespace NapsterProject
                 IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
                 EndPoint Remote = (EndPoint)(sender);
                 int recv = socketUDP.ReceiveFrom(data, ref Remote);
-                peerHandler.UpdateClient(Remote);
-                Console.WriteLine("Message received from {0}:", Remote.ToString());
-                Console.WriteLine(Encoding.ASCII.GetString(data, 0, recv));
+                peerHandler.UpdateClient(Remote); // passes peer info to handler to restart timer
+                //Console.WriteLine("Message received from {0}:", Remote.ToString());
+                //Console.WriteLine(Encoding.ASCII.GetString(data, 0, recv));
             }
         }
 
+        /*
+         * This will place client's available file info into 
+         * the directory file in the PeerDirectory folder
+         * and send the client the available info on registered
+         * peers (peer ips and files available to download)
+         */
         private void newCliFunc(object newSock)
         {
             Socket tempSock = newSock as Socket; //retrieves socket from passed parameter
             byte[] buffer = new byte[2048]; //buffer for receiving info from client
             peerHandler.ReceivePeer(tempSock.RemoteEndPoint);
             int size = tempSock.Receive(buffer); //receives info from client
-            Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
-            //Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
             if (!ASCIIEncoding.ASCII.GetString(buffer).Contains("REFRESH"))
             {
                 char[] delimiters = { ';' };
@@ -96,12 +98,7 @@ namespace NapsterProject
             buffer = ASCIIEncoding.ASCII.GetBytes(message);
             tempSock.Send(buffer);
 
-            /*
-             * This will place client's available file info into 
-             * the directory file in the PeerDirectory folder
-             * and send the client the available info on registered
-             * peers (peer ips and files available to download)
-             */
+            
             //message = ASCIIEncoding.ASCII.GetString(buffer);
             //Console.WriteLine(message.Substring(0, message.LastIndexOf(';')));
         }
@@ -109,20 +106,25 @@ namespace NapsterProject
         private void addToFileList(List<string> files, EndPoint endPoint)
         {
             string directoryFile = @".\PeerDirectory\" + endPoint.ToString().Split(':')[0] + "_" + files.ElementAt(0) + ".txt"; // The file where we want to save the client/file informaiton
-            //Console.WriteLine(directoryFile);
-            files.RemoveAt(0);
+            files.RemoveAt(0); // removes port number from beginning of file list
             File.WriteAllLines(directoryFile, files); // Write all the data in the list to the file.
             // Save the list of files from the client to the directory.
         }
 
+        /*
+         * Compiles all available peers and their shared files to send to client
+         * 
+         * note this no longer is able to sort out clients own files form list
+         * ran out of time to fix
+         */
         private string compilePeers(Socket tempSock)
         {
-            DirectoryInfo peers = new DirectoryInfo(path);
+            DirectoryInfo peers = new DirectoryInfo(path); // Directory of peer registry
             string ipString = tempSock.RemoteEndPoint.ToString().Split(':')[0];
             string message = "";
             foreach (FileInfo file in peers.GetFiles())
             {
-                if (file.Name != ipString + ".txt")
+                if (file.Name != ipString + ".txt") // supposed to ignore file corresponding to requesting peer
                 {
                     message += file.Name.Substring(0,file.Name.LastIndexOf('.')) + ";";
                     StreamReader sr = new StreamReader(path + "\\" + file.Name);
