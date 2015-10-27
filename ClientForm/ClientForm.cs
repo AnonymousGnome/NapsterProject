@@ -192,12 +192,13 @@ namespace ClientFormProject
                 registerButton.Enabled = true;
                 refreshButton.Enabled = false;
                 disconnectButton.Enabled = false;
-                messageLabel.Text = "Disconnected from server...";
                 fileBox.Items.Clear();
                 peerFiles.Clear();
 
                 sock.Shutdown(SocketShutdown.Both);
                 sock.Close();
+
+                messageLabel.Text = "Disconnected from server...";
             }
             catch (Exception ee)
             {
@@ -247,7 +248,7 @@ namespace ClientFormProject
                 {
                     listenSock.Listen(10); //puts into listening state
                     Socket newSock = listenSock.Accept(); //accepts incoming connection
-                    Console.WriteLine("Incoming Connection on port 9000...");
+                    Console.WriteLine("Incoming Connection on port 9002...");
                     Thread newCli = new Thread(new ParameterizedThreadStart(newCliFunc)); //generates new thread and socket for handling new client
                     newCli.Start(newSock); //starts thread and passes socket to thread function
                 }
@@ -263,11 +264,14 @@ namespace ClientFormProject
             byte[] buffer = new byte[2048];
             Socket tempSock = newSock as Socket;
             tempSock.Receive(buffer);
-            Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
+            Console.WriteLine(path + "\\" + ASCIIEncoding.ASCII.GetString(buffer));
+
+            tempSock.SendFile(path + "\\" + ASCIIEncoding.ASCII.GetString(buffer));
         }
 
         private void downloadButton_Click(object sender, EventArgs e)
         {
+            Socket peerSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
             {
                 string ipKey = "";
@@ -279,15 +283,27 @@ namespace ClientFormProject
                         ipKey = p.Key;
                     }
                 }
-                //ConnectSocket(IPAddress.Parse(ipKey), 9002);
 
                 buffer = new byte[2048];
 
                 buffer = ASCIIEncoding.ASCII.GetBytes(requestedFile);
-                //sock.Send(buffer);
+                peerSock.Send(buffer);
 
-                //sock.Shutdown(SocketShutdown.Both);
-                //sock.Close();
+                using (var output = File.Create("result.dat"))
+                {
+                    Console.WriteLine("Client connected. Starting to receive the file");
+
+                    // read the file in chunks of 1KB
+                    buffer = new byte[2048];
+                    int bytesRead;
+                    //while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+                    //{
+                    //    output.Write(buffer, 0, bytesRead);
+                    //}
+                }
+
+                peerSock.Shutdown(SocketShutdown.Both);
+                peerSock.Close();
             }
             catch (Exception ee)
             {
