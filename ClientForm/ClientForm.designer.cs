@@ -55,6 +55,7 @@
             this.hostIPText.Name = "hostIPText";
             this.hostIPText.Size = new System.Drawing.Size(141, 20);
             this.hostIPText.TabIndex = 1;
+            this.hostIPText.Text = "127.0.0.1";
             // 
             // label1
             // 
