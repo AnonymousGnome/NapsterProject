@@ -91,7 +91,7 @@ namespace NapsterProject
             }
 
             string message = compilePeers(tempSock);
-            
+            message = "j";
             Console.WriteLine(message);
             buffer = ASCIIEncoding.ASCII.GetBytes(message);
             tempSock.Send(buffer);
@@ -134,7 +134,14 @@ namespace NapsterProject
                     sr.Close();
                 }
             }
-            return message;
+            if (message.Length == 0)
+            {
+                return "No data";
+            }
+            else
+            {
+                return message;
+            }
         }
     }
 }

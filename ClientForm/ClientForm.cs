@@ -85,24 +85,28 @@ namespace ClientFormProject
                 }
 
                 buffer = ASCIIEncoding.ASCII.GetBytes(sendString);
+                Console.WriteLine("1");
                 sock.Send(buffer);
+                Console.WriteLine("2");
                 buffer = new byte[2048];
+                Console.WriteLine("3");
                 sock.Receive(buffer);
-                Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
-
-                string peers = ASCIIEncoding.ASCII.GetString(buffer);
-
-                foreach (string s in peers.Split('?'))
-                {
-                    string[] files = s.Split(';');
-                    List<string> temp = new List<string>();
-                    for (int i = 1; i < files.Length; i++)
-                    {
-                        fileBox.Items.Add(files[i] + "\t\t\t" + files[0]);
-                        temp.Add(files[i]);
-                    }
-                    peerFiles.Add(files[0], temp);
-                }
+                Console.WriteLine("4");
+                //Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
+                //Console.WriteLine("5");
+                //string peers = ASCIIEncoding.ASCII.GetString(buffer);
+                //Console.WriteLine("6");
+                //foreach (string s in peers.Split('?'))
+                //{
+                //    string[] files = s.Split(';');
+                //    List<string> temp = new List<string>();
+                //    for (int i = 1; i < files.Length; i++)
+                //    {
+                //        fileBox.Items.Add(files[i] + "\t\t\t" + files[0]);
+                //        temp.Add(files[i]);
+                //    }
+                //    peerFiles.Add(files[0], temp);
+                //}
 
                 sock.Shutdown(SocketShutdown.Both);
                 sock.Close();
@@ -110,7 +114,7 @@ namespace ClientFormProject
                 //starts hello message timer
                 timer.Start();
                 //if(!listenSock.Connected)
-                //    StartListening();
+                StartListening();
             }
             //catch (SocketException socex)
             //{
