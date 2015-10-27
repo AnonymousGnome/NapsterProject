@@ -37,6 +37,7 @@
             this.messageLabel = new System.Windows.Forms.Label();
             this.downloadButton = new System.Windows.Forms.Button();
             this.openDirecButton = new System.Windows.Forms.Button();
+            this.portText = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // registerButton
@@ -125,11 +126,19 @@
             this.openDirecButton.UseVisualStyleBackColor = true;
             this.openDirecButton.Click += new System.EventHandler(this.openDirecButton_Click);
             // 
+            // portText
+            // 
+            this.portText.Location = new System.Drawing.Point(259, 28);
+            this.portText.Name = "portText";
+            this.portText.Size = new System.Drawing.Size(100, 20);
+            this.portText.TabIndex = 9;
+            // 
             // ClientForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(826, 462);
+            this.Controls.Add(this.portText);
             this.Controls.Add(this.openDirecButton);
             this.Controls.Add(this.downloadButton);
             this.Controls.Add(this.messageLabel);
@@ -157,5 +166,6 @@
         private System.Windows.Forms.Label messageLabel;
         private System.Windows.Forms.Button downloadButton;
         private System.Windows.Forms.Button openDirecButton;
+        private System.Windows.Forms.TextBox portText;
     }
 }

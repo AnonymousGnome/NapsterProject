@@ -83,6 +83,7 @@ namespace NapsterProject
             byte[] buffer = new byte[2048]; //buffer for receiving info from client
             peerHandler.ReceivePeer(tempSock.RemoteEndPoint);
             int size = tempSock.Receive(buffer); //receives info from client
+            Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
             //Console.WriteLine(ASCIIEncoding.ASCII.GetString(buffer));
             if (!ASCIIEncoding.ASCII.GetString(buffer).Contains("REFRESH"))
             {
@@ -107,8 +108,9 @@ namespace NapsterProject
 
         private void addToFileList(List<string> files, EndPoint endPoint)
         {
-            string directoryFile = @".\PeerDirectory\" + endPoint.ToString().Split(':')[0] + ".txt"; // The file where we want to save the client/file informaiton
+            string directoryFile = @".\PeerDirectory\" + endPoint.ToString().Split(':')[0] + "_" + files.ElementAt(0) + ".txt"; // The file where we want to save the client/file informaiton
             //Console.WriteLine(directoryFile);
+            files.RemoveAt(0);
             File.WriteAllLines(directoryFile, files); // Write all the data in the list to the file.
             // Save the list of files from the client to the directory.
         }

@@ -22,6 +22,7 @@ namespace ClientFormProject
         private int countDown = 10; // seconds timer waits until send next message
         private IPAddress hostIP; // holds ip for the central directory server
         private IPEndPoint ipEnd, listenSockEnd; // endpoints for hello message to directory server and listening socket
+        private int listenPort;
 
         byte[] buffer, helloMes; // bufferes for sending over network
         string path; // Filepath for shared files
@@ -41,7 +42,7 @@ namespace ClientFormProject
             System.IO.Directory.CreateDirectory(path);
 
             //listenSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            //listenSockEnd = new IPEndPoint(IPAddress.Any, 9002);
+            //listenSockEnd = new IPEndPoint(IPAddress.Any, listenPort);
             //listenSock.Bind(listenSockEnd);
         }
 
@@ -58,6 +59,7 @@ namespace ClientFormProject
                 //ConnectSocket(hostIP, 9000);
                 //Takes input host ip address and establishes connection
                 hostIP = IPAddress.Parse(hostIPText.Text);
+                listenPort = Int32.Parse(portText.Text);
                 ipEnd = new IPEndPoint(hostIP, 9001);
                 
                 sock.Connect(hostIP, 9000);
@@ -75,7 +77,7 @@ namespace ClientFormProject
                  * info from the directory server.
                  */
                 string[] fileEntries = Directory.GetFiles(path); // retrieves filenames of all files in the SharedFiles folder
-                string sendString = "";
+                string sendString = listenPort + ";";
                 foreach (string s in fileEntries)
                 {
                     string[] temp = s.Split('\\');
@@ -267,7 +269,7 @@ namespace ClientFormProject
             {
                 string[] requestedFileArray = fileBox.SelectedItem.ToString().Split('\t');
 
-                peerSock.Connect(IPAddress.Parse(requestedFileArray[3]), 9002);
+                peerSock.Connect(IPAddress.Parse(requestedFileArray[3]), listenPort);
 
                 buffer = new byte[2048];
 
@@ -278,13 +280,7 @@ namespace ClientFormProject
                 {
                     Console.WriteLine("Client connected. Starting to receive the file");
 
-                    // read the file in chunks of 1KB
-                    buffer = new byte[2048];
-                    int bytesRead;
-                    //while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
-                    //{
-                    //    output.Write(buffer, 0, bytesRead);
-                    //}
+                    
                 }
 
                 peerSock.Shutdown(SocketShutdown.Both);
