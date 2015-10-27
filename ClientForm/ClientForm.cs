@@ -12,6 +12,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.IO;
 using System.Net.NetworkInformation;
+using System.Diagnostics;
 
 namespace ClientFormProject
 {
@@ -70,7 +71,6 @@ namespace ClientFormProject
 
                 //activates buttons
                 disconnectButton.Enabled = true;
-                refreshButton.Enabled = true;
                 registerButton.Enabled = false;
 
                 
@@ -260,11 +260,13 @@ namespace ClientFormProject
             try
             {
                 string dir = Directory.GetCurrentDirectory() + @"\SharedFiles";
-                byte[] buffer = new byte[2048];
                 Socket tempSock = newSock as Socket;
                 tempSock.Receive(buffer);
-                messageLabel.Text = dir + @"\" + ASCIIEncoding.ASCII.GetString(buffer);
-                string filePath = dir + @"\" + ASCIIEncoding.ASCII.GetString(buffer);
+                buffer = new byte[Int32.Parse(ASCIIEncoding.ASCII.GetString(buffer))];
+                tempSock.Receive(buffer);
+                messageLabel.Text = dir + @"\" + ASCIIEncoding.ASCII.GetString(buffer).Trim();
+                string filePath = dir + @"\" + ASCIIEncoding.ASCII.GetString(buffer).Trim();
+                FindIllegalPathChars(@filePath);
                 byte[] bytes = System.IO.File.ReadAllBytes(@filePath);
                 string size = bytes.Length.ToString();
                 tempSock.Send(ASCIIEncoding.ASCII.GetBytes(size));
@@ -291,8 +293,10 @@ namespace ClientFormProject
                 {
                     messageLabel.Text = "Client connected. Starting to receive the file";
 
-                    buffer = ASCIIEncoding.ASCII.GetBytes(requestedFileArray[0]);
-                    peerSock.Send(buffer);
+                    byte[] bytes = ASCIIEncoding.ASCII.GetBytes(requestedFileArray[0]);
+                    string size = bytes.Length.ToString();
+                    peerSock.Send(ASCIIEncoding.ASCII.GetBytes(size));
+                    peerSock.Send(bytes);
 
                     peerSock.Receive(buffer);
                     //messageLabel.Text = ASCIIEncoding.ASCII.GetString(buffer);
@@ -332,5 +336,19 @@ namespace ClientFormProject
         {
 
         }
+        void FindIllegalPathChars(string path)
+        {
+            int index = -1;
+            do
+            {
+                index = path.IndexOfAny(Path.GetInvalidPathChars(), index + 1);
+                if (index > -1)
+                {
+                    messageLabel.Text = String.Format("Invalid char \"{0}\" at position {1}",  index, path[index]);
+                }
+
+            } while (index > -1);
+        }
     }
+
 }
