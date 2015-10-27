@@ -171,7 +171,7 @@ namespace ClientFormProject
             countDown--;
             if (countDown < 1)
             {
-                countDown = 10;
+                countDown = 60;
 
                 sockUDP.SendTo(helloMes, ipEnd);
             }
@@ -185,7 +185,7 @@ namespace ClientFormProject
             try
             {
                 timer.Stop();
-                countDown = 10;
+                countDown = 60;
                 registerButton.Enabled = true;
                 refreshButton.Enabled = false;
                 disconnectButton.Enabled = false;

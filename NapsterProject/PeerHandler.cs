@@ -60,6 +60,8 @@ namespace NapsterProject
             countDown--;
             if (countDown < 1)
             {
+                Console.Clear();
+                Console.WriteLine("Registered Peers...");
                 countDown = 1;
                 try
                 {
@@ -67,6 +69,7 @@ namespace NapsterProject
                     {
                         int value = p.Value;
                         value--;
+                        Console.WriteLine(p.Key + ": " + p.Value);
                         if (value < 1)
                         {
                             Console.WriteLine("Removed {0} from list.", p.Key); // alerts when peer is removed from registry
@@ -74,7 +77,7 @@ namespace NapsterProject
 
                             foreach (FileInfo file in peers.GetFiles())
                             {
-                                if(file.Name == p.Key.ToString() + ".txt")
+                                if(file.Name.Split('_')[0] == p.Key.ToString())
                                     file.Delete(); // deletes peer with expired timer
                             }
                             int i;
