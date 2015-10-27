@@ -135,7 +135,7 @@ namespace NapsterProject
             }
             if (message.Length == 0)
             {
-                return "No data";
+                return "No Available Peers";
             }
             else
             {
