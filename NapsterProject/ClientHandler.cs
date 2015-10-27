@@ -91,7 +91,6 @@ namespace NapsterProject
             }
 
             string message = compilePeers(tempSock);
-            message = "j";
             Console.WriteLine(message);
             buffer = ASCIIEncoding.ASCII.GetBytes(message);
             tempSock.Send(buffer);
