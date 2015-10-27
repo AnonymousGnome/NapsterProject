@@ -41,9 +41,7 @@ namespace ClientFormProject
             path = @".\SharedFiles";
             System.IO.Directory.CreateDirectory(path);
 
-            //listenSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            //listenSockEnd = new IPEndPoint(IPAddress.Any, listenPort);
-            //listenSock.Bind(listenSockEnd);
+            
         }
 
         private void registerButton_Click(object sender, EventArgs e)
@@ -52,7 +50,8 @@ namespace ClientFormProject
 
             //creates sockets for TCP and UDP connections
             sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            sockUDP = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            sockUDP = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp); listenSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            
 
             try
             {
@@ -61,6 +60,8 @@ namespace ClientFormProject
                 hostIP = IPAddress.Parse(hostIPText.Text);
                 listenPort = Int32.Parse(portText.Text);
                 ipEnd = new IPEndPoint(hostIP, 9001);
+                listenSockEnd = new IPEndPoint(IPAddress.Any, listenPort);
+                listenSock.Bind(listenSockEnd);
                 
                 sock.Connect(hostIP, 9000);
                 //ipEnd = new IPEndPoint(hostIP, 9001);
@@ -241,7 +242,7 @@ namespace ClientFormProject
                 {
                     listenSock.Listen(10); //puts into listening state
                     Socket newSock = listenSock.Accept(); //accepts incoming connection
-                    messageLabel.Text = "Incoming Connection on port 9002...";
+                    messageLabel.Text = "Incoming Connection on port " + listenPort;
                     Thread newCli = new Thread(new ParameterizedThreadStart(newCliFunc)); //generates new thread and socket for handling new client
                     newCli.Start(newSock); //starts thread and passes socket to thread function
                 }
