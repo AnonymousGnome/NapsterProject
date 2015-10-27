@@ -241,7 +241,7 @@ namespace ClientFormProject
                 {
                     listenSock.Listen(10); //puts into listening state
                     Socket newSock = listenSock.Accept(); //accepts incoming connection
-                    Console.WriteLine("Incoming Connection on port 9002...");
+                    messageLabel.Text = "Incoming Connection on port 9002...";
                     Thread newCli = new Thread(new ParameterizedThreadStart(newCliFunc)); //generates new thread and socket for handling new client
                     newCli.Start(newSock); //starts thread and passes socket to thread function
                 }
@@ -254,12 +254,22 @@ namespace ClientFormProject
 
         void newCliFunc(object newSock)
         {
-            byte[] buffer = new byte[2048];
-            Socket tempSock = newSock as Socket;
-            tempSock.Receive(buffer);
-            Console.WriteLine(path + "\\" + ASCIIEncoding.ASCII.GetString(buffer));
+            try
+            {
+                byte[] buffer = new byte[2048];
+                Socket tempSock = newSock as Socket;
+                tempSock.Receive(buffer);
+                Console.WriteLine(path + "\\" + ASCIIEncoding.ASCII.GetString(buffer));
 
-            tempSock.SendFile(path + "\\" + ASCIIEncoding.ASCII.GetString(buffer));
+                byte[] bytes = System.IO.File.ReadAllBytes(path + "\\" + ASCIIEncoding.ASCII.GetString(buffer));
+                string size = bytes.Length.ToString();
+                tempSock.Send(ASCIIEncoding.ASCII.GetBytes(size));
+                tempSock.Send(bytes);
+            }
+            catch(Exception e)
+            {
+                messageLabel.Text = e.Message;
+            }
         }
 
         private void downloadButton_Click(object sender, EventArgs e)
@@ -269,26 +279,30 @@ namespace ClientFormProject
             {
                 string[] requestedFileArray = fileBox.SelectedItem.ToString().Split('\t');
 
-                peerSock.Connect(IPAddress.Parse(requestedFileArray[3]), listenPort);
+                peerSock.Connect(IPAddress.Parse(requestedFileArray[3].Split('_')[0]), Int32.Parse(requestedFileArray[3].Split('_')[1]));
 
                 buffer = new byte[2048];
+
+                if (peerSock.Connected)
+                    messageLabel.Text = "Client connected. Starting to receive the file";
+                else
+                    messageLabel.Text = "Cannot connect to client";
 
                 buffer = ASCIIEncoding.ASCII.GetBytes(requestedFileArray[0]);
                 peerSock.Send(buffer);
 
-                using (var output = File.Create("result.dat"))
-                {
-                    Console.WriteLine("Client connected. Starting to receive the file");
-
-                    
-                }
+                peerSock.Receive(buffer);
+                //messageLabel.Text = ASCIIEncoding.ASCII.GetString(buffer);
+                buffer = new byte[Int32.Parse(ASCIIEncoding.ASCII.GetString(buffer))];
+                peerSock.Receive(buffer);
+                File.WriteAllBytes(path + "\\" + requestedFileArray[0], buffer);
 
                 peerSock.Shutdown(SocketShutdown.Both);
                 peerSock.Close();
             }
             catch (Exception ee)
             {
-                Console.WriteLine(ee.Message);
+                messageLabel.Text = ee.Message;
             }
         }
 
