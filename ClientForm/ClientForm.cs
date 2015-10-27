@@ -257,19 +257,20 @@ namespace ClientFormProject
         {
             try
             {
+                string dir = Directory.GetCurrentDirectory() + @"\SharedFiles";
                 byte[] buffer = new byte[2048];
                 Socket tempSock = newSock as Socket;
                 tempSock.Receive(buffer);
-                Console.WriteLine(path + "\\" + ASCIIEncoding.ASCII.GetString(buffer));
-
-                byte[] bytes = System.IO.File.ReadAllBytes(path + "\\" + ASCIIEncoding.ASCII.GetString(buffer));
+                messageLabel.Text = dir + @"\" + ASCIIEncoding.ASCII.GetString(buffer);
+                string filePath = dir + @"\" + ASCIIEncoding.ASCII.GetString(buffer);
+                byte[] bytes = System.IO.File.ReadAllBytes(@filePath);
                 string size = bytes.Length.ToString();
                 tempSock.Send(ASCIIEncoding.ASCII.GetBytes(size));
                 tempSock.Send(bytes);
             }
             catch(Exception e)
             {
-                messageLabel.Text = e.Message;
+                messageLabel.Text = e.Message + ":1";
             }
         }
 
@@ -285,21 +286,23 @@ namespace ClientFormProject
                 buffer = new byte[2048];
 
                 if (peerSock.Connected)
+                {
                     messageLabel.Text = "Client connected. Starting to receive the file";
+
+                    buffer = ASCIIEncoding.ASCII.GetBytes(requestedFileArray[0]);
+                    peerSock.Send(buffer);
+
+                    peerSock.Receive(buffer);
+                    //messageLabel.Text = ASCIIEncoding.ASCII.GetString(buffer);
+                    buffer = new byte[Int32.Parse(ASCIIEncoding.ASCII.GetString(buffer))];
+                    peerSock.Receive(buffer);
+                    File.WriteAllBytes(path + "\\" + requestedFileArray[0], buffer);
+
+                    peerSock.Shutdown(SocketShutdown.Both);
+                    peerSock.Close();
+                }
                 else
                     messageLabel.Text = "Cannot connect to client";
-
-                buffer = ASCIIEncoding.ASCII.GetBytes(requestedFileArray[0]);
-                peerSock.Send(buffer);
-
-                peerSock.Receive(buffer);
-                //messageLabel.Text = ASCIIEncoding.ASCII.GetString(buffer);
-                buffer = new byte[Int32.Parse(ASCIIEncoding.ASCII.GetString(buffer))];
-                peerSock.Receive(buffer);
-                File.WriteAllBytes(path + "\\" + requestedFileArray[0], buffer);
-
-                peerSock.Shutdown(SocketShutdown.Both);
-                peerSock.Close();
             }
             catch (Exception ee)
             {
