@@ -22,7 +22,6 @@ namespace ClientFormProject
         private int countDown = 10; // seconds timer waits until send next message
         private IPAddress hostIP; // holds ip for the central directory server
         private IPEndPoint ipEnd, listenSockEnd; // endpoints for hello message to directory server and listening socket
-        private Dictionary<string, List<string>> peerFiles;
 
         byte[] buffer, helloMes; // bufferes for sending over network
         string path; // Filepath for shared files
@@ -40,7 +39,6 @@ namespace ClientFormProject
 
             path = @".\SharedFiles";
             System.IO.Directory.CreateDirectory(path);
-            peerFiles = new Dictionary<string, List<string>>();
 
             //listenSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             //listenSockEnd = new IPEndPoint(IPAddress.Any, 9002);
@@ -97,9 +95,7 @@ namespace ClientFormProject
                     for (int i = 1; i < files.Length; i++)
                     {
                         fileBox.Items.Add(files[i] + "\t\t\t" + files[0]);
-                        temp.Add(files[i]);
                     }
-                    peerFiles.Add(files[0], temp);
                 }
 
                 sock.Shutdown(SocketShutdown.Both);
@@ -135,8 +131,6 @@ namespace ClientFormProject
              * send fresh info about registered 
              * peers and available files for download
              */
-
-            peerFiles.Clear();
             fileBox.Items.Clear();
             //ConnectSocket(hostIP, 9000);
 
@@ -157,9 +151,7 @@ namespace ClientFormProject
                 for (int i = 1; i < files.Length; i++)
                 {
                     fileBox.Items.Add(files[i] + "\t\t\t" + files[0]);
-                    temp.Add(files[i]);
                 }
-                peerFiles.Add(files[0], temp);
             }
 
             //sock.Shutdown(SocketShutdown.Both);
@@ -193,7 +185,6 @@ namespace ClientFormProject
                 refreshButton.Enabled = false;
                 disconnectButton.Enabled = false;
                 fileBox.Items.Clear();
-                peerFiles.Clear();
 
                 sock.Shutdown(SocketShutdown.Both);
                 sock.Close();
@@ -274,19 +265,13 @@ namespace ClientFormProject
             Socket peerSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
             {
-                string ipKey = "";
-                string requestedFile = fileBox.SelectedItem.ToString();
-                foreach (var p in peerFiles)
-                {
-                    if (requestedFile.Contains(p.Key))
-                    {
-                        ipKey = p.Key;
-                    }
-                }
+                string[] requestedFileArray = fileBox.SelectedItem.ToString().Split('\t');
+
+                peerSock.Connect(IPAddress.Parse(requestedFileArray[3]), 9002);
 
                 buffer = new byte[2048];
 
-                buffer = ASCIIEncoding.ASCII.GetBytes(requestedFile);
+                buffer = ASCIIEncoding.ASCII.GetBytes(requestedFileArray[0]);
                 peerSock.Send(buffer);
 
                 using (var output = File.Create("result.dat"))
